@@ -1,0 +1,103 @@
+import Link from "next/link";
+
+import { dismissReminder } from "@/lib/actions";
+import { listDueReminders } from "@/lib/queries";
+import { findStaleApplications, DEFAULT_STALE_DAYS } from "@/lib/reminders";
+import { formatDate, relativeDays } from "@/lib/format";
+import { SweepButton } from "@/components/sweep-button";
+
+/**
+ * Reads live database state on every request, so it must never be prerendered
+ * into a build-time snapshot.
+ */
+export const dynamic = "force-dynamic";
+
+export default async function RemindersPage() {
+  const [due, stale] = await Promise.all([
+    listDueReminders(),
+    findStaleApplications(DEFAULT_STALE_DAYS),
+  ]);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Reminders
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Applications with no movement in {DEFAULT_STALE_DAYS} days.
+          </p>
+        </div>
+        <SweepButton />
+      </div>
+
+      <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          Due now ({due.length})
+        </h2>
+        {due.length === 0 ? (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Nothing due.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {due.map((r) => (
+              <li
+                key={r.id}
+                className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 px-3 py-2 dark:border-zinc-800"
+              >
+                <div className="min-w-0">
+                  <Link
+                    href={`/applications/${r.applicationId}`}
+                    className="text-sm font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+                  >
+                    {r.title} · {r.companyName}
+                  </Link>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {r.message ?? r.kind} · due {formatDate(r.dueAt)}
+                  </p>
+                </div>
+                <form action={dismissReminder.bind(null, r.id)}>
+                  <button
+                    type="submit"
+                    className="shrink-0 rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                  >
+                    Dismiss
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          Going quiet ({stale.length})
+        </h2>
+        {stale.length === 0 ? (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Every open application has moved recently.
+          </p>
+        ) : (
+          <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            {stale.map((app) => (
+              <li key={app.id} className="flex items-center justify-between py-2">
+                <Link
+                  href={`/applications/${app.id}`}
+                  className="text-sm text-zinc-900 hover:underline dark:text-zinc-100"
+                >
+                  {app.title} · {app.companyName}
+                </Link>
+                <span className="text-xs tabular-nums text-zinc-500 dark:text-zinc-400">
+                  {app.daysSince}d since {relativeDays(app.lastEventAt)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}

@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/*
+ * Drive `dark:` from a class on <html> instead of the OS setting alone, so the
+ * toggle can override the system preference. The theme script sets that class
+ * before paint; without it every `dark:` utility would ignore a manual choice.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,11 +19,23 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* System preference, unless an explicit choice has been stamped on <html>. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+/* An explicit choice always wins over the system preference. */
+:root.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+:root.light {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 body {

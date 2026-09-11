@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789069651742,
+      "tag": "0000_spotty_otto_octavius",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789078596139,
+      "tag": "0001_graceful_madame_masque",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789079536758,
+      "tag": "0002_acoustic_mandrill",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789079843639,
+      "tag": "0003_yellow_toad_men",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789081180504,
+      "tag": "0004_lumpy_mimic",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789094576208,
+      "tag": "0005_tough_miss_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789103655139,
+      "tag": "0006_amused_harry_osborn",
+      "breakpoints": true
+    }
+  ]
+}

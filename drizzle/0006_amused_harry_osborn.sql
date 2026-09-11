@@ -1,0 +1,2 @@
+CREATE TYPE "public"."sponsorship" AS ENUM('will_sponsor', 'no_sponsorship', 'citizen', 'green_card', 'clearance');--> statement-breakpoint
+ALTER TABLE "applications" ADD COLUMN "sponsorship" "sponsorship";

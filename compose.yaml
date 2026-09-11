@@ -1,0 +1,69 @@
+name: job-tracker
+
+services:
+  web:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/job_tracker
+      AWS_ENDPOINT_URL: http://localstack:4566
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      S3_BUCKET: job-tracker-docs
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: job_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      # Postgres 18+ wants the mount at /var/lib/postgresql (not .../data) so it
+      # can keep major-version subdirectories and support pg_upgrade --link.
+      - db-data:/var/lib/postgresql
+      # Creates job_tracker_test on first init of the volume. See also the
+      # guard in src/test/setup.ts.
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d job_tracker"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  localstack:
+    image: localstack/localstack:4
+    environment:
+      SERVICES: s3
+      DEBUG: "0"
+    ports:
+      - "4566:4566"
+    volumes:
+      - ./localstack/init/ready.d:/etc/localstack/init/ready.d
+      - localstack-data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD-SHELL", "awslocal s3 ls s3://job-tracker-docs || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  db-data:
+  localstack-data:
