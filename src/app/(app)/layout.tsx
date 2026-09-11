@@ -1,52 +1,44 @@
 import Link from "next/link";
 
 import { ThemeToggle } from "@/components/theme-toggle";
-
-const NAV = [
-  { href: "/board", label: "Board" },
-  { href: "/applications", label: "Applications" },
-  { href: "/companies", label: "Companies" },
-  { href: "/analytics", label: "Analytics" },
-  { href: "/reminders", label: "Reminders" },
-  { href: "/admin", label: "Admin" },
-];
+import { NavLinks } from "@/components/nav-links";
+import { BrandMark } from "@/components/icons";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-full flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="flex min-h-full flex-col bg-background">
+      {/*
+        Sticky so the nav and the primary actions stay reachable on the board,
+        which scrolls both ways. The blur keeps the tinted page ground visible
+        through the bar instead of capping it with a flat white slab.
+      */}
+      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/80 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/80">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-6 py-3">
-          <Link
-            href="/board"
-            className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
-          >
-            Job Tracker
+          <Link href="/board" className="flex items-center gap-2">
+            {/* The same mark as the browser tab, in the brand gradient, so the
+                tab and the page read as one product. */}
+            <BrandMark />
+            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-sm font-semibold tracking-tight text-transparent dark:from-violet-300 dark:to-indigo-300">
+              Job Tracker
+            </span>
           </Link>
-          <nav className="flex gap-1">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-md px-3 py-1.5 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+
+          <NavLinks />
+
           <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
-          <Link
-            href="/applications/import"
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          >
-            Import from JD
-          </Link>
-          <Link
-            href="/applications/new"
-            className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-          >
-            New application
-          </Link>
+            <ThemeToggle />
+            <Link
+              href="/applications/import"
+              className="rounded-lg border border-violet-200 px-3 py-1.5 text-sm font-medium text-violet-700 transition-colors hover:border-violet-300 hover:bg-violet-50 dark:border-violet-900 dark:text-violet-300 dark:hover:border-violet-700 dark:hover:bg-violet-950/50"
+            >
+              Import from JD
+            </Link>
+            <Link
+              href="/applications/new"
+              className="rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35"
+            >
+              New application
+            </Link>
           </div>
         </div>
       </header>

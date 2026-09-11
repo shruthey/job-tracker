@@ -77,7 +77,7 @@ export default async function ApplicationDetailPage(
           <form action={archive}>
             <button
               type="submit"
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-600 hover:bg-rose-50 hover:text-rose-700 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-rose-950 dark:hover:text-rose-300"
+              className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-rose-800 dark:hover:bg-rose-950 dark:hover:text-rose-300"
             >
               Archive
             </button>
@@ -87,7 +87,7 @@ export default async function ApplicationDetailPage(
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Tags
             </h2>
@@ -98,7 +98,7 @@ export default async function ApplicationDetailPage(
             />
           </section>
 
-          <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <ApplicationForm
               action={action}
               submitLabel="Save changes"
@@ -126,7 +126,7 @@ export default async function ApplicationDetailPage(
 
           <DocumentsPanel applicationId={id} documents={docs} />
 
-          <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Status history
             </h2>

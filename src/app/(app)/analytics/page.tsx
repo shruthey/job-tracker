@@ -10,7 +10,7 @@ import {
   FunnelChart,
   StageDurationChart,
 } from "@/components/analytics-charts";
-import { STATUS_LABELS } from "@/lib/format";
+import { STATUS_DOT_STYLES, STATUS_LABELS } from "@/lib/format";
 
 /**
  * Reads live database state on every request, so it must never be prerendered
@@ -18,13 +18,51 @@ import { STATUS_LABELS } from "@/lib/format";
  */
 export const dynamic = "force-dynamic";
 
-function Stat({ label, value }: { label: string; value: number }) {
+/**
+ * Tile colours by tone rather than by status, because the six totals do not
+ * map one-to-one onto board statuses — "Active" and "Interviewing" span
+ * several. The accent bar along the top carries the colour; the surface stays
+ * white so a row of six tiles does not turn into a row of six coloured slabs.
+ */
+const STAT_TONES = {
+  violet: "from-violet-500 to-indigo-500",
+  blue: "from-blue-500 to-sky-500",
+  amber: "from-amber-500 to-orange-500",
+  emerald: "from-emerald-500 to-teal-500",
+  rose: "from-rose-500 to-pink-500",
+  zinc: "from-zinc-400 to-zinc-500",
+} as const;
+
+const STAT_TEXT = {
+  violet: "text-violet-600 dark:text-violet-400",
+  blue: "text-blue-600 dark:text-blue-400",
+  amber: "text-amber-600 dark:text-amber-400",
+  emerald: "text-emerald-600 dark:text-emerald-400",
+  rose: "text-rose-600 dark:text-rose-400",
+  zinc: "text-zinc-500 dark:text-zinc-400",
+} as const;
+
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: keyof typeof STAT_TONES;
+}) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <span
+        aria-hidden="true"
+        className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${STAT_TONES[tone]}`}
+      />
       <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
         {label}
       </p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+      <p
+        className={`mt-1 text-2xl font-semibold tabular-nums ${STAT_TEXT[tone]}`}
+      >
         {value}
       </p>
     </div>
@@ -41,7 +79,7 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-zinc-200 bg-white p-5 text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+    <section className="rounded-xl border border-zinc-200 bg-white p-5 text-zinc-500 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
       <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
         {title}
       </h2>
@@ -74,12 +112,12 @@ export default async function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <Stat label="Active" value={totals.active} />
-        <Stat label="Applied" value={totals.applied} />
-        <Stat label="Interviewing" value={totals.interviewing} />
-        <Stat label="Offers" value={totals.offers} />
-        <Stat label="Rejected" value={totals.rejected} />
-        <Stat label="Ghosted" value={totals.ghosted} />
+        <Stat label="Active" value={totals.active} tone="violet" />
+        <Stat label="Applied" value={totals.applied} tone="blue" />
+        <Stat label="Interviewing" value={totals.interviewing} tone="amber" />
+        <Stat label="Offers" value={totals.offers} tone="emerald" />
+        <Stat label="Rejected" value={totals.rejected} tone="rose" />
+        <Stat label="Ghosted" value={totals.ghosted} tone="zinc" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -93,7 +131,13 @@ export default async function AnalyticsPage() {
               {funnel.map((stage) => (
                 <tr key={stage.status}>
                   <td className="py-1.5 text-zinc-700 dark:text-zinc-300">
-                    {STATUS_LABELS[stage.status]}
+                    <span className="inline-flex items-center gap-1.5">
+                      <span
+                        aria-hidden="true"
+                        className={`h-2 w-2 rounded-full ${STATUS_DOT_STYLES[stage.status]}`}
+                      />
+                      {STATUS_LABELS[stage.status]}
+                    </span>
                   </td>
                   <td className="py-1.5 text-right tabular-nums text-zinc-900 dark:text-zinc-100">
                     {stage.reached}

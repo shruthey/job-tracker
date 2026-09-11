@@ -71,7 +71,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
               aria-current={active ? "page" : undefined}
               className={`rounded-md px-3 py-1.5 font-mono text-xs transition-colors ${
                 active
-                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                  ? "bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-sm shadow-violet-600/25"
                   : "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
               }`}
             >
@@ -126,7 +126,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <table className="w-full min-w-[56rem] text-sm">
             <thead className="border-b border-zinc-200 text-left text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
               <tr>

@@ -72,12 +72,12 @@ function QuickAdd() {
           required
           placeholder="Add a company…"
           aria-label="Company name"
-          className="min-w-0 flex-1 rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 placeholder:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+          className="min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
         />
         <button
           type="submit"
           disabled={pending}
-          className="shrink-0 rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+          className="shrink-0 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35 disabled:opacity-50 disabled:shadow-none"
         >
           {pending ? "Adding…" : "Add"}
         </button>
@@ -192,12 +192,12 @@ function ContactRow({ company }: { company: CompanyOverview }) {
             onKeyDown={(e) => {
               if (e.key === "Escape") setAdding(false);
             }}
-            className="w-28 rounded-md border border-zinc-300 bg-white px-2 py-0.5 text-xs text-zinc-900 placeholder:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className="w-28 rounded-md border border-zinc-300 bg-white px-2 py-0.5 text-xs text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
           />
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-zinc-900 px-2 py-0.5 text-xs font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+            className="rounded-md bg-gradient-to-br from-violet-600 to-indigo-600 px-2 py-0.5 text-xs font-medium text-white shadow-sm shadow-violet-600/25 disabled:opacity-50 disabled:shadow-none"
           >
             Add
           </button>
@@ -350,7 +350,7 @@ export function CompanyColumns({ companies }: { companies: CompanyOverview[] }) 
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <section className="flex flex-col gap-2.5 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="flex flex-col gap-2.5 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
             To apply
@@ -375,7 +375,7 @@ export function CompanyColumns({ companies }: { companies: CompanyOverview[] }) 
         )}
       </section>
 
-      <section className="flex flex-col gap-2.5 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="flex flex-col gap-2.5 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
             Applied

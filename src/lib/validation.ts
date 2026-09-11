@@ -62,6 +62,16 @@ export const applicationInputSchema = z
 
 export type ApplicationInput = z.infer<typeof applicationInputSchema>;
 
+/**
+ * The parsed-posting variant. Everything the model extracted is editable and
+ * optional as usual, but the link back to the posting is not — it is the one
+ * field the parse cannot fill, and without it a saved row has no way back to
+ * the source it was built from.
+ */
+export const parsedApplicationInputSchema = applicationInputSchema.safeExtend({
+  jobUrl: z.string().trim().min(1, "Job URL is required").url("Must be a valid URL"),
+});
+
 export const moveApplicationSchema = z.object({
   applicationId: z.string().uuid(),
   toStatus: z.enum(applicationStatus.enumValues),

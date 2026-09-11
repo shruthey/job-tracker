@@ -24,6 +24,7 @@ import {
   addContactSchema,
   addTargetCompanySchema,
   applicationInputSchema,
+  parsedApplicationInputSchema,
   interviewInputSchema,
   moveApplicationSchema,
   removeContactSchema,
@@ -48,7 +49,28 @@ export async function createApplication(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const parsed = parseForm(formData);
+  return createFrom(applicationInputSchema, formData);
+}
+
+/**
+ * The parsed-posting path. Same insert, stricter input: the job URL is the one
+ * field the parse cannot supply, so it is required here but stays optional for
+ * an application typed in by hand.
+ */
+export async function createApplicationFromJd(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  return createFrom(parsedApplicationInputSchema, formData);
+}
+
+async function createFrom(
+  schema:
+    | typeof applicationInputSchema
+    | typeof parsedApplicationInputSchema,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = schema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return toActionState(parsed.error);
 
   const input = parsed.data;

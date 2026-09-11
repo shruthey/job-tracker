@@ -32,9 +32,18 @@ export default async function RemindersPage() {
         <SweepButton />
       </div>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-          Due now ({due.length})
+      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          Due now
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ${
+              due.length > 0
+                ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+            }`}
+          >
+            {due.length}
+          </span>
         </h2>
         {due.length === 0 ? (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -45,7 +54,7 @@ export default async function RemindersPage() {
             {due.map((r) => (
               <li
                 key={r.id}
-                className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 px-3 py-2 dark:border-zinc-800"
+                className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2 transition-colors hover:bg-amber-50 dark:border-amber-900/70 dark:bg-amber-950/25 dark:hover:bg-amber-950/40"
               >
                 <div className="min-w-0">
                   <Link
@@ -61,7 +70,7 @@ export default async function RemindersPage() {
                 <form action={dismissReminder.bind(null, r.id)}>
                   <button
                     type="submit"
-                    className="shrink-0 rounded-md border border-zinc-300 px-2.5 py-1 text-xs text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                    className="shrink-0 rounded-lg border border-amber-300 bg-white px-2.5 py-1 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-zinc-900 dark:text-amber-300 dark:hover:bg-amber-950"
                   >
                     Dismiss
                   </button>
@@ -72,9 +81,18 @@ export default async function RemindersPage() {
         )}
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-          Going quiet ({stale.length})
+      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          Going quiet
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ${
+              stale.length > 0
+                ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+            }`}
+          >
+            {stale.length}
+          </span>
         </h2>
         {stale.length === 0 ? (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -83,14 +101,21 @@ export default async function RemindersPage() {
         ) : (
           <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {stale.map((app) => (
-              <li key={app.id} className="flex items-center justify-between py-2">
+              <li key={app.id} className="flex items-center justify-between gap-3 py-2">
                 <Link
                   href={`/applications/${app.id}`}
-                  className="text-sm text-zinc-900 hover:underline dark:text-zinc-100"
+                  className="text-sm text-zinc-900 transition-colors hover:text-violet-700 hover:underline dark:text-zinc-100 dark:hover:text-violet-300"
                 >
                   {app.title} · {app.companyName}
                 </Link>
-                <span className="text-xs tabular-nums text-zinc-500 dark:text-zinc-400">
+                {/* The longer the silence, the hotter the stamp. */}
+                <span
+                  className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-medium tabular-nums ${
+                    app.daysSince >= 30
+                      ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                      : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                  }`}
+                >
                   {app.daysSince}d since {relativeDays(app.lastEventAt)}
                 </span>
               </li>

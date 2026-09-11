@@ -23,7 +23,7 @@ type Values = Partial<{
 }>;
 
 const inputClass =
-  "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
+  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
 
 function Field({
   label,
@@ -64,6 +64,7 @@ export function ApplicationForm({
   submitLabel,
   cancelHref,
   jdPosition = "bottom",
+  requireJobUrl = false,
 }: {
   action: (prev: ActionState, formData: FormData) => Promise<ActionState>;
   values?: Values;
@@ -75,6 +76,11 @@ export function ApplicationForm({
    * the posting you just pasted, and the fields to check matter more.
    */
   jdPosition?: "top" | "bottom";
+  /**
+   * When the posting was parsed rather than typed, the link back to it is the
+   * one thing the model cannot supply — so it leads the form and is required.
+   */
+  requireJobUrl?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, { ok: true });
   const errors = state.fieldErrors ?? {};
@@ -87,6 +93,29 @@ export function ApplicationForm({
       hint="Years of experience, tools, and technologies are highlighted."
     >
       <JdPreview id="jdRaw" name="jdRaw" value={values.jdRaw ?? ""} />
+    </Field>
+  );
+
+  const jobUrlField = (
+    <Field
+      label="Job URL"
+      htmlFor="jobUrl"
+      errors={errors.jobUrl}
+      hint={
+        requireJobUrl
+          ? "Paste the link to the posting so you can get back to it."
+          : undefined
+      }
+    >
+      <input
+        id="jobUrl"
+        name="jobUrl"
+        type="url"
+        required={requireJobUrl}
+        defaultValue={values.jobUrl ?? ""}
+        className={inputClass}
+        placeholder="https://..."
+      />
     </Field>
   );
 
@@ -105,6 +134,8 @@ export function ApplicationForm({
       ) : null}
 
       {jdPosition === "top" ? jdField : null}
+
+      {requireJobUrl ? jobUrlField : null}
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Company" htmlFor="company" errors={errors.company}>
@@ -226,17 +257,7 @@ export function ApplicationForm({
             placeholder="USD"
           />
         </Field>
-
-        <Field label="Job URL" htmlFor="jobUrl" errors={errors.jobUrl}>
-          <input
-            id="jobUrl"
-            name="jobUrl"
-            type="url"
-            defaultValue={values.jobUrl ?? ""}
-            className={inputClass}
-            placeholder="https://..."
-          />
-        </Field>
+        {requireJobUrl ? null : jobUrlField}
       </div>
 
       {jdPosition === "bottom" ? jdField : null}
@@ -245,7 +266,7 @@ export function ApplicationForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35 disabled:opacity-50 disabled:shadow-none"
         >
           {pending ? "Saving…" : submitLabel}
         </button>

@@ -25,6 +25,106 @@ export const STATUS_STYLES: Record<ApplicationStatus, string> = {
   ghosted: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300",
 };
 
+/**
+ * The column chrome on the board — surface, border, and the rail that runs
+ * down each company group. Separate from STATUS_STYLES because a badge sits on
+ * a card and needs contrast, while a column is a large field behind cards and
+ * has to stay quiet enough for white cards to read as raised above it.
+ */
+export const STATUS_COLUMN_STYLES: Record<ApplicationStatus, string> = {
+  saved: "border-zinc-200 bg-zinc-100/70 dark:border-zinc-800 dark:bg-zinc-900/50",
+  applied: "border-blue-200 bg-blue-50/70 dark:border-blue-900/60 dark:bg-blue-950/25",
+  screen: "border-cyan-200 bg-cyan-50/70 dark:border-cyan-900/60 dark:bg-cyan-950/25",
+  interview:
+    "border-violet-200 bg-violet-50/70 dark:border-violet-900/60 dark:bg-violet-950/25",
+  onsite: "border-amber-200 bg-amber-50/70 dark:border-amber-900/60 dark:bg-amber-950/25",
+  offer:
+    "border-emerald-200 bg-emerald-50/70 dark:border-emerald-900/60 dark:bg-emerald-950/25",
+  rejected: "border-rose-200 bg-rose-50/60 dark:border-rose-900/60 dark:bg-rose-950/20",
+  withdrawn: "border-zinc-200 bg-zinc-100/70 dark:border-zinc-800 dark:bg-zinc-900/50",
+  ghosted:
+    "border-orange-200 bg-orange-50/60 dark:border-orange-900/60 dark:bg-orange-950/20",
+};
+
+/** The same hues at drop-target strength, for the column being dragged over. */
+export const STATUS_COLUMN_OVER_STYLES: Record<ApplicationStatus, string> = {
+  saved: "border-zinc-400 bg-zinc-200/80 dark:border-zinc-500 dark:bg-zinc-800",
+  applied: "border-blue-400 bg-blue-100/80 dark:border-blue-600 dark:bg-blue-950/60",
+  screen: "border-cyan-400 bg-cyan-100/80 dark:border-cyan-600 dark:bg-cyan-950/60",
+  interview:
+    "border-violet-400 bg-violet-100/80 dark:border-violet-600 dark:bg-violet-950/60",
+  onsite: "border-amber-400 bg-amber-100/80 dark:border-amber-600 dark:bg-amber-950/60",
+  offer:
+    "border-emerald-400 bg-emerald-100/80 dark:border-emerald-600 dark:bg-emerald-950/60",
+  rejected: "border-rose-400 bg-rose-100/80 dark:border-rose-600 dark:bg-rose-950/60",
+  withdrawn: "border-zinc-400 bg-zinc-200/80 dark:border-zinc-500 dark:bg-zinc-800",
+  ghosted:
+    "border-orange-400 bg-orange-100/80 dark:border-orange-600 dark:bg-orange-950/60",
+};
+
+/**
+ * The left rail and header bar on a company group, tinted to its column so a
+ * group reads as belonging to the stage around it.
+ */
+export const STATUS_RAIL_STYLES: Record<ApplicationStatus, string> = {
+  saved: "border-zinc-400 dark:border-zinc-600",
+  applied: "border-blue-400 dark:border-blue-600",
+  screen: "border-cyan-400 dark:border-cyan-600",
+  interview: "border-violet-400 dark:border-violet-600",
+  onsite: "border-amber-400 dark:border-amber-600",
+  offer: "border-emerald-400 dark:border-emerald-600",
+  rejected: "border-rose-400 dark:border-rose-600",
+  withdrawn: "border-zinc-400 dark:border-zinc-600",
+  ghosted: "border-orange-400 dark:border-orange-600",
+};
+
+/**
+ * A single dot in the status hue, for places that need the colour without the
+ * weight of a full badge — menu rows, legends, a table's leading marker.
+ */
+export const STATUS_DOT_STYLES: Record<ApplicationStatus, string> = {
+  saved: "bg-zinc-400",
+  applied: "bg-blue-500",
+  screen: "bg-cyan-500",
+  interview: "bg-violet-500",
+  onsite: "bg-amber-500",
+  offer: "bg-emerald-500",
+  rejected: "bg-rose-500",
+  withdrawn: "bg-zinc-500",
+  ghosted: "bg-orange-500",
+};
+
+/**
+ * The card's left edge, in its column's hue. A card sits on a tinted column
+ * and was previously white-on-near-white from every angle; this gives each
+ * tile one saturated edge so it has a defined boundary at rest, without
+ * tinting the whole surface and hurting the text contrast on top of it.
+ */
+export const STATUS_CARD_EDGE_STYLES: Record<ApplicationStatus, string> = {
+  saved: "border-l-zinc-400 dark:border-l-zinc-500",
+  applied: "border-l-blue-500 dark:border-l-blue-400",
+  screen: "border-l-cyan-500 dark:border-l-cyan-400",
+  interview: "border-l-violet-500 dark:border-l-violet-400",
+  onsite: "border-l-amber-500 dark:border-l-amber-400",
+  offer: "border-l-emerald-500 dark:border-l-emerald-400",
+  rejected: "border-l-rose-500 dark:border-l-rose-400",
+  withdrawn: "border-l-zinc-400 dark:border-l-zinc-500",
+  ghosted: "border-l-orange-500 dark:border-l-orange-400",
+};
+
+/** Solid fills for charts, one per status, matching the badge hues above. */
+export const STATUS_CHART_COLORS: Record<ApplicationStatus, string> = {
+  saved: "#a1a1aa",
+  applied: "#3b82f6",
+  screen: "#06b6d4",
+  interview: "#8b5cf6",
+  onsite: "#f59e0b",
+  offer: "#10b981",
+  rejected: "#f43f5e",
+  withdrawn: "#71717a",
+  ghosted: "#fb923c",
+};
+
 export const TAG_LABELS: Record<ApplicationTag, string> = {
   need_referral: "Need Referral",
   referral_requested: "Referral Requested",

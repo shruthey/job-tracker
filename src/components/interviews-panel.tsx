@@ -7,7 +7,7 @@ import { formatDateTime, INTERVIEW_FORMAT_LABELS } from "@/lib/format";
 import type { Interview } from "@/db/schema";
 
 const inputClass =
-  "w-full rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
+  "w-full rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 transition-colors focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
 
 export type InterviewItem = Interview & { isPast: boolean };
 
@@ -23,7 +23,7 @@ export function InterviewsPanel({
   const [, startTransition] = useTransition();
 
   return (
-    <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
         Interviews
       </h2>
@@ -135,7 +135,7 @@ export function InterviewsPanel({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+          className="rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35 disabled:opacity-50 disabled:shadow-none"
         >
           {pending ? "Scheduling…" : "Schedule interview"}
         </button>
