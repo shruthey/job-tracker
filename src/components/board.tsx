@@ -27,13 +27,11 @@ import {
   formatDateTime,
   formatSalary,
   relativeDays,
-  STATUS_COLUMN_OVER_STYLES,
-  STATUS_CARD_EDGE_STYLES,
-  STATUS_COLUMN_STYLES,
-  STATUS_DOT_STYLES,
+  statusBadgeStyle,
+  statusColumnStyle,
+  statusDotStyle,
+  statusLineStyle,
   STATUS_LABELS,
-  STATUS_RAIL_STYLES,
-  STATUS_STYLES,
 } from "@/lib/format";
 import { TagList } from "@/components/tag-chip";
 import { SponsorshipBadge } from "@/components/sponsorship-badge";
@@ -261,18 +259,18 @@ function ColumnPicker({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="true"
-        className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 shadow-sm transition-colors hover:border-violet-300 hover:text-violet-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-violet-700 dark:hover:text-violet-300"
+        className="rounded-lg border border-chrome bg-surface px-3 py-1.5 text-sm text-ink shadow-sm transition-colors hover:border-brand hover:text-brand dark:border-chrome dark:bg-chrome dark:text-muted dark:hover:border-brand dark:hover:text-brand"
       >
         Columns
         {hiddenCount > 0 ? (
-          <span className="ml-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="ml-1.5 text-xs text-muted dark:text-muted">
             {visible.length}/{BOARD_ORDER.length}
           </span>
         ) : null}
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-20 mt-1.5 w-60 rounded-xl border border-zinc-200 bg-white p-1.5 shadow-xl shadow-zinc-900/10 dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40">
+        <div className="absolute right-0 z-20 mt-1.5 w-60 rounded-xl border border-chrome bg-surface p-1.5 shadow-xl shadow-chrome/10 dark:border-chrome dark:bg-chrome dark:shadow-black/40">
           <ul className="flex flex-col">
             {BOARD_ORDER.map((status) => {
               const checked = visible.includes(status);
@@ -284,7 +282,7 @@ function ColumnPicker({
                     className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm ${
                       isLast
                         ? "cursor-not-allowed opacity-50"
-                        : "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                        : "cursor-pointer hover:bg-ground dark:hover:bg-chrome"
                     }`}
                   >
                     <input
@@ -292,20 +290,21 @@ function ColumnPicker({
                       checked={checked}
                       disabled={isLast}
                       onChange={() => toggle(status)}
-                      className="h-3.5 w-3.5 rounded border-zinc-300 accent-violet-600 dark:border-zinc-600"
+                      className="h-3.5 w-3.5 rounded border-chrome accent-brand dark:border-chrome"
                     />
                     <span
-                      className={`inline-flex flex-1 items-center gap-1.5 text-zinc-800 dark:text-zinc-200 ${
+                      className={`inline-flex flex-1 items-center gap-1.5 text-ink dark:text-muted ${
                         checked ? "" : "opacity-60"
                       }`}
                     >
                       <span
                         aria-hidden="true"
-                        className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT_STYLES[status]}`}
+                        className="h-2 w-2 shrink-0 rounded-full"
+                        style={statusDotStyle(status)}
                       />
                       {STATUS_LABELS[status]}
                     </span>
-                    <span className="text-xs tabular-nums text-zinc-400 dark:text-zinc-500">
+                    <span className="text-xs tabular-nums text-muted dark:text-muted">
                       {counts.get(status) ?? 0}
                     </span>
                   </label>
@@ -314,18 +313,18 @@ function ColumnPicker({
             })}
           </ul>
 
-          <div className="mt-1 flex gap-1 border-t border-zinc-200 pt-1 dark:border-zinc-700">
+          <div className="mt-1 flex gap-1 border-t border-chrome pt-1 dark:border-chrome">
             <button
               type="button"
               onClick={() => onChange([...BOARD_ORDER])}
-              className="flex-1 rounded-md px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              className="flex-1 rounded-md px-2 py-1 text-xs text-muted hover:bg-ground dark:text-muted dark:hover:bg-chrome"
             >
               Show all
             </button>
             <button
               type="button"
               onClick={() => onChange([...DEFAULT_VISIBLE])}
-              className="flex-1 rounded-md px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              className="flex-1 rounded-md px-2 py-1 text-xs text-muted hover:bg-ground dark:text-muted dark:hover:bg-chrome"
             >
               Reset
             </button>
@@ -357,10 +356,10 @@ function CollapseAllToggle({
     <button
       type="button"
       onClick={() => setCollapsedFor(groupKeys, anyExpanded)}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-700 shadow-sm transition-colors hover:border-violet-300 hover:text-violet-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-violet-700 dark:hover:text-violet-300"
+      className="inline-flex items-center gap-1.5 rounded-lg border border-chrome bg-surface px-3 py-1.5 text-sm text-ink shadow-sm transition-colors hover:border-brand hover:text-brand dark:border-chrome dark:bg-chrome dark:text-muted dark:hover:border-brand dark:hover:text-brand"
     >
       <ChevronRightIcon
-        className={`h-3 w-3 text-zinc-500 transition-transform dark:text-zinc-400 ${
+        className={`h-3 w-3 text-muted transition-transform dark:text-muted ${
           anyExpanded ? "rotate-90" : ""
         }`}
       />
@@ -401,25 +400,26 @@ function CardTile({
 
   return (
     <div
-      className={`group rounded-lg border border-zinc-300 border-l-4 bg-white px-2.5 py-2 shadow-sm transition-all hover:-translate-y-0.5 hover:border-violet-400 hover:shadow-lg hover:shadow-violet-500/25 hover:ring-2 hover:ring-violet-400/40 dark:border-zinc-700 dark:bg-zinc-800/90 dark:hover:border-violet-400 dark:hover:bg-zinc-800 dark:hover:shadow-violet-400/25 dark:hover:ring-violet-400/40 ${
-        STATUS_CARD_EDGE_STYLES[card.status]
-      } ${dragging ? "opacity-50" : ""}`}
+      className={`group rounded-lg border border-chrome border-l-4 bg-surface px-2.5 py-2 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand hover:shadow-lg hover:shadow-brand/25 hover:ring-2 hover:ring-brand/40 dark:border-chrome dark:bg-chrome/90 dark:hover:border-brand dark:hover:bg-chrome dark:hover:shadow-brand/25 dark:hover:ring-brand/40 ${
+        dragging ? "opacity-50" : ""
+      }`}
+      style={{ borderLeftColor: statusLineStyle(card.status).borderColor }}
     >
       {/* Extra right padding clears the external-link icon overlaid above. */}
       <p
-        className={`text-sm font-semibold leading-snug text-zinc-900 transition-colors group-hover:text-violet-700 dark:text-zinc-50 dark:group-hover:text-violet-300 ${
+        className={`text-sm font-semibold leading-snug text-ink transition-colors group-hover:text-brand dark:text-muted dark:group-hover:text-brand ${
           card.jobUrl ? "pr-6" : ""
         }`}
       >
         {card.title}
       </p>
       {showCompany ? (
-        <p className="mt-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+        <p className="mt-0.5 text-xs font-medium text-ink dark:text-muted">
           {card.companyName}
         </p>
       ) : null}
       {card.location ? (
-        <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
+        <p className="mt-0.5 text-xs text-muted dark:text-muted">
           {card.location}
           {card.remoteType ? ` · ${card.remoteType}` : ""}
         </p>
@@ -438,20 +438,20 @@ function CardTile({
         className="mt-1.5"
       />
       {card.nextInterviewAt ? (
-        <p className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-violet-50 px-1.5 py-0.5 text-xs font-medium text-violet-700 ring-1 ring-inset ring-violet-200 dark:bg-violet-950/60 dark:text-violet-300 dark:ring-violet-900">
+        <p className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-brand/20 px-1.5 py-0.5 text-xs font-medium text-ink ring-1 ring-inset ring-brand dark:bg-brand/30 dark:text-ink dark:ring-brand">
           <CalendarIcon className="h-3 w-3" />
           {formatDateTime(card.nextInterviewAt)}
         </p>
       ) : null}
       <div className="mt-1.5 flex items-center justify-between gap-2">
         {salary ? (
-          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+          <span className="text-xs font-semibold text-brand dark:text-brand">
             {salary}
           </span>
         ) : (
           <span />
         )}
-        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs text-muted dark:text-muted">
           {relativeDays(card.updatedAt)}
         </span>
       </div>
@@ -490,7 +490,7 @@ function DraggableCard({ card }: { card: Card }) {
           onClick={(e) => e.stopPropagation()}
           title="Open job posting"
           aria-label={`Open the job posting for ${card.title} at ${card.companyName} in a new tab`}
-          className="absolute right-1.5 top-1.5 rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-zinc-500 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+          className="absolute right-1.5 top-1.5 rounded p-1 text-muted transition-colors hover:bg-ground hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-chrome dark:text-muted dark:hover:bg-chrome dark:hover:text-muted"
         >
           <ExternalLinkIcon />
         </a>
@@ -538,19 +538,17 @@ function Column({
   return (
     <section
       ref={setNodeRef}
-      className={`flex w-72 shrink-0 flex-col rounded-xl border p-2 transition-colors ${
-        isOver
-          ? STATUS_COLUMN_OVER_STYLES[status]
-          : STATUS_COLUMN_STYLES[status]
-      }`}
+      className="flex w-72 shrink-0 flex-col rounded-xl border p-2 transition-colors"
+      style={statusColumnStyle(status, isOver)}
     >
       <header className="flex items-center justify-between px-1.5 py-1.5">
         <span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status]}`}
+          className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+          style={statusBadgeStyle(status)}
         >
           {STATUS_LABELS[status]}
         </span>
-        <span className="text-xs tabular-nums text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs tabular-nums text-muted dark:text-muted">
           {cards.length}
         </span>
       </header>
@@ -570,7 +568,8 @@ function Column({
                 chevron alone.
               */}
               <div
-                className={`flex items-center gap-1 rounded-md border-l-[3px] bg-white/70 pr-2 dark:bg-zinc-900/70 ${STATUS_RAIL_STYLES[status]}`}
+                className="flex items-center gap-1 rounded-md border-l-[3px] bg-surface/70 pr-2 dark:bg-chrome/70"
+                style={statusLineStyle(status)}
               >
                 {/*
                   The toggle is its own element rather than the whole bar,
@@ -582,19 +581,19 @@ function Column({
                   onClick={() => toggleCollapsed(key)}
                   aria-expanded={!isCollapsed}
                   aria-controls={panelId}
-                  className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-2 py-1 text-left transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+                  className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-2 py-1 text-left transition-colors hover:bg-chrome/5 dark:hover:bg-ground/10"
                 >
                   <ChevronRightIcon
-                    className={`h-3 w-3 shrink-0 text-zinc-500 transition-transform dark:text-zinc-400 ${
+                    className={`h-3 w-3 shrink-0 text-muted transition-transform dark:text-muted ${
                       isCollapsed ? "" : "rotate-90"
                     }`}
                   />
-                  <span className="truncate text-[11px] font-bold uppercase tracking-wider text-zinc-800 dark:text-zinc-100">
+                  <span className="truncate text-[11px] font-bold uppercase tracking-wider text-ink dark:text-muted">
                     {group.companyName}
                   </span>
                   {/* Collapsed, the count is the only clue to what is inside. */}
                   {group.cards.length > 1 || isCollapsed ? (
-                    <span className="ml-auto shrink-0 text-[11px] font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
+                    <span className="ml-auto shrink-0 text-[11px] font-semibold tabular-nums text-muted dark:text-muted">
                       {group.cards.length}
                     </span>
                   ) : null}
@@ -628,7 +627,7 @@ function Column({
           );
         })}
         {cards.length === 0 ? (
-          <p className="px-1 py-6 text-center text-xs text-zinc-400 dark:text-zinc-600">
+          <p className="px-1 py-6 text-center text-xs text-muted dark:text-muted">
             Nothing here
           </p>
         ) : null}
@@ -734,7 +733,7 @@ export function Board({ cards }: { cards: Card[] }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-muted dark:text-muted">
           {hiddenCards > 0
             ? `${hiddenCards} ${hiddenCards === 1 ? "card" : "cards"} in hidden columns`
             : " "}
@@ -750,7 +749,7 @@ export function Board({ cards }: { cards: Card[] }) {
       </div>
 
       {error ? (
-        <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-300">
+        <p className="rounded-lg border border-warn bg-warn/20 px-3 py-2 text-sm text-ink dark:border-warn dark:bg-warn/30 dark:text-ink">
           {error}
         </p>
       ) : null}

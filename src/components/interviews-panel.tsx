@@ -7,7 +7,7 @@ import { formatDateTime, INTERVIEW_FORMAT_LABELS } from "@/lib/format";
 import type { Interview } from "@/db/schema";
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 transition-colors focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
+  "w-full rounded-lg border border-chrome bg-surface px-2.5 py-1.5 text-sm text-ink transition-colors focus:border-brand dark:border-chrome dark:bg-chrome dark:text-muted";
 
 export type InterviewItem = Interview & { isPast: boolean };
 
@@ -23,13 +23,13 @@ export function InterviewsPanel({
   const [, startTransition] = useTransition();
 
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+    <section className="rounded-xl border border-chrome bg-surface p-5 shadow-sm dark:border-chrome dark:bg-chrome">
+      <h2 className="mb-3 text-sm font-semibold text-ink dark:text-muted">
         Interviews
       </h2>
 
       {interviews.length === 0 ? (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted dark:text-muted">
           Nothing scheduled.
         </p>
       ) : (
@@ -41,26 +41,26 @@ export function InterviewsPanel({
             return (
               <li
                 key={interview.id}
-                className="flex items-start justify-between gap-2 rounded-md border border-zinc-200 px-3 py-2 dark:border-zinc-800"
+                className="flex items-start justify-between gap-2 rounded-md border border-chrome px-3 py-2 dark:border-chrome"
               >
                 <div className="min-w-0">
                   <p
                     className={`text-sm font-medium ${
                       past
-                        ? "text-zinc-400 line-through dark:text-zinc-600"
-                        : "text-zinc-900 dark:text-zinc-100"
+                        ? "text-muted line-through dark:text-muted"
+                        : "text-ink dark:text-muted"
                     }`}
                   >
                     {formatDateTime(interview.scheduledAt)}
                   </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="text-xs text-muted dark:text-muted">
                     {`Round ${interview.round}`}
                     {interview.format
                       ? ` · ${INTERVIEW_FORMAT_LABELS[interview.format]}`
                       : ""}
                   </p>
                   {interview.notes ? (
-                    <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-0.5 text-xs text-muted dark:text-muted">
                       {interview.notes}
                     </p>
                   ) : null}
@@ -72,7 +72,7 @@ export function InterviewsPanel({
                       void deleteInterview(interview.id);
                     })
                   }
-                  className="shrink-0 text-xs text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400"
+                  className="shrink-0 text-xs text-muted hover:text-warn dark:hover:text-warn"
                 >
                   Remove
                 </button>
@@ -84,11 +84,11 @@ export function InterviewsPanel({
 
       <form
         action={formAction}
-        className="flex flex-col gap-2 border-t border-zinc-200 pt-4 dark:border-zinc-800"
+        className="flex flex-col gap-2 border-t border-chrome pt-4 dark:border-chrome"
       >
         <label
           htmlFor="scheduledAt"
-          className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
+          className="text-xs font-medium text-ink dark:text-muted"
         >
           Date and time
         </label>
@@ -100,7 +100,7 @@ export function InterviewsPanel({
           className={inputClass}
         />
         {state.fieldErrors?.scheduledAt ? (
-          <p className="text-xs text-rose-600 dark:text-rose-400">
+          <p className="text-xs text-warn dark:text-warn">
             {state.fieldErrors.scheduledAt[0]}
           </p>
         ) : null}
@@ -135,7 +135,7 @@ export function InterviewsPanel({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35 disabled:opacity-50 disabled:shadow-none"
+          className="rounded-lg bg-gradient-to-br from-brand to-brand px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-brand/25 transition-shadow hover:shadow-md hover:shadow-brand/35 disabled:opacity-50 disabled:shadow-none"
         >
           {pending ? "Scheduling…" : "Schedule interview"}
         </button>
@@ -144,8 +144,8 @@ export function InterviewsPanel({
           <p
             className={`text-xs ${
               state.ok
-                ? "text-emerald-700 dark:text-emerald-400"
-                : "text-rose-600 dark:text-rose-400"
+                ? "text-brand dark:text-brand"
+                : "text-warn dark:text-warn"
             }`}
           >
             {state.message}

@@ -90,8 +90,8 @@ export function BrandMark({
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#8b5cf6" />
-          <stop offset="100%" stopColor="#4f46e5" />
+          <stop offset="0%" stopColor="var(--color-brand)" />
+          <stop offset="100%" stopColor="var(--color-warn)" />
         </linearGradient>
       </defs>
       {/*

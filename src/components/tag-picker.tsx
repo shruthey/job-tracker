@@ -5,11 +5,10 @@ import { useOptimistic, useTransition } from "react";
 import { toggleApplicationTag } from "@/lib/actions";
 import {
   isTagAllowed,
-  TAG_ORDER,
   type ApplicationStatus,
   type ApplicationTag,
 } from "@/db/schema";
-import { STATUS_LABELS, TAG_LABELS, TAG_STYLES } from "@/lib/format";
+import { STATUS_LABELS, TAG_LABELS, TAG_ORDER, tagChipStyle } from "@/lib/format";
 
 /**
  * Every tag is always visible, so the full vocabulary stays discoverable. Ones
@@ -69,11 +68,14 @@ export function TagPicker({
             }
             className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
               disabled
-                ? "cursor-not-allowed bg-zinc-50 text-zinc-300 dark:bg-zinc-900/50 dark:text-zinc-700"
+                ? "cursor-not-allowed bg-ground text-muted dark:bg-chrome/50 dark:text-ink"
                 : on
-                  ? `${TAG_STYLES[tag]}${allowed ? "" : " opacity-60"}`
-                  : "bg-zinc-50 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:bg-zinc-900 dark:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                  ? allowed
+                    ? ""
+                    : "opacity-60"
+                  : "bg-ground text-muted hover:bg-ground hover:text-muted dark:bg-chrome dark:text-muted dark:hover:bg-chrome dark:hover:text-muted"
             }`}
+            style={on && !disabled ? tagChipStyle(tag) : undefined}
           >
             {TAG_LABELS[tag]}
           </button>

@@ -7,52 +7,154 @@
  */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * ─────────────────────────────────────────────────────────────────────────
+ *  THE PALETTE — the only place colour is defined.
+ * ─────────────────────────────────────────────────────────────────────────
+ *
+ * Five colours per theme, used exactly as given: nothing shades or ramps them.
+ * Each theme's values are written once, in `--light-*` and `--dark-*` below;
+ * the selectors further down only choose between those two sets, so changing a
+ * colour means editing exactly one line.
+ *
+ * The five roles, in both themes:
+ *
+ *   brand    the brand hue — links, primary buttons, the active funnel
+ *   warn     the closing-door hue — rejected, ghosted, destructive actions
+ *   attn     the attention hue — offers, and anything asking you to act
+ *   ground   the page behind everything
+ *   chrome   borders, rules, and the inert states
+ *
+ * The four values after them are not free choices — they follow from the five
+ * and must stay legible against them. See the note on `--on-tint` below.
+ */
 :root {
-  /*
-   * Not pure white: a faintly warm, slightly violet-tinted ground so the white
-   * cards on top of it read as raised rather than dissolving into the page.
-   */
-  --background: #fbfaff;
-  --foreground: #1c1a27;
-  /* The brand accent, used for links, focus rings, and the primary button. */
-  --accent: #6d5aed;
-  --accent-foreground: #ffffff;
+  --light-brand: #0e9384; /* Teal */
+  --light-warn: #dc5f4a; /* Burnt orange */
+  --light-attn: #f6c445; /* Citrus yellow */
+  --light-ground: #fdfaf1; /* Warm cream */
+  --light-chrome: #e8e2d1; /* Oat */
+
+  --light-ink: #1f2a28;
+  --light-muted: #5c6b66;
+  --light-surface: #ffffff;
+  --light-on-tint: #1f2a28;
+  --light-on-chrome-tint: #1f2a28;
+
+  --dark-brand: #5ed3c4;
+  --dark-warn: #f08a70;
+  --dark-attn: #f6c445;
+  --dark-ground: #0e1716;
+  --dark-chrome: #33413d;
+
+  --dark-ink: #e9f2ef;
+  --dark-muted: #9db3ad;
+  --dark-surface: #16211f;
+  --dark-on-tint: #16211f;
+  --dark-on-chrome-tint: #e9f2ef;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/*
+ * How a tinted chip is built, per theme.
+ *
+ * In light mode the five are dark colours on a near-white page, so even a
+ * faint tint is pale and takes dark text — the floor can be 0.
+ *
+ * In dark mode the five are *light* colours on a near-black page, so a faint
+ * tint lands in the mid-tones where neither dark nor light text reads. Chips
+ * are therefore floored at 55% hue, which keeps every chip in the light half
+ * where dark text reads; strength still varies across the remaining span, so
+ * the funnel ordering survives. `--chrome` is the exception in both themes —
+ * it is the one colour whose lightness flips between them, so chips built
+ * from it get their own text colour.
+ */
+/* The light theme is the default, and an explicit `.light` re-asserts it. */
+:root,
+:root.light {
+  --brand: var(--light-brand);
+  --warn: var(--light-warn);
+  --attn: var(--light-attn);
+  --ground: var(--light-ground);
+  --chrome: var(--light-chrome);
+  --ink: var(--light-ink);
+  --muted: var(--light-muted);
+  --surface: var(--light-surface);
+  --on-tint: var(--light-on-tint);
+  --on-chrome-tint: var(--light-on-chrome-tint);
+
+  --chip-base: var(--light-ground);
+  --chip-floor: 0%;
+  --chip-span: 100%;
 }
 
-/* System preference, unless an explicit choice has been stamped on <html>. */
+/* The system preference, unless an explicit choice is stamped on <html>. */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --background: #0b0a12;
-    --foreground: #e8e6f0;
-    --accent: #9f8fff;
+    --brand: var(--dark-brand);
+    --warn: var(--dark-warn);
+    --attn: var(--dark-attn);
+    --ground: var(--dark-ground);
+    --chrome: var(--dark-chrome);
+    --ink: var(--dark-ink);
+    --muted: var(--dark-muted);
+    --surface: var(--dark-surface);
+    --on-tint: var(--dark-on-tint);
+    --on-chrome-tint: var(--dark-on-chrome-tint);
+
+    --chip-base: var(--dark-ground);
+    --chip-floor: 55%;
+    --chip-span: 45%;
   }
 }
 
 /* An explicit choice always wins over the system preference. */
 :root.dark {
-  --background: #0b0a12;
-  --foreground: #e8e6f0;
-  --accent: #9f8fff;
+  --brand: var(--dark-brand);
+  --warn: var(--dark-warn);
+  --attn: var(--dark-attn);
+  --ground: var(--dark-ground);
+  --chrome: var(--dark-chrome);
+  --ink: var(--dark-ink);
+  --muted: var(--dark-muted);
+  --surface: var(--dark-surface);
+  --on-tint: var(--dark-on-tint);
+  --on-chrome-tint: var(--dark-on-chrome-tint);
+
+  --chip-base: var(--dark-ground);
+  --chip-floor: 55%;
+  --chip-span: 45%;
 }
 
-:root.light {
-  --background: #fbfaff;
-  --foreground: #1c1a27;
-  --accent: #6d5aed;
+/*
+ * The palette exposed as utilities: `bg-brand`, `text-warn`, `border-chrome`,
+ * and so on. These are the only colour utilities the app may use — there is no
+ * `bg-brand-200`, because there is no such colour.
+ */
+@theme inline {
+  --color-brand: var(--brand);
+  --color-warn: var(--warn);
+  --color-attn: var(--attn);
+  --color-ground: var(--ground);
+  --color-chrome: var(--chrome);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-on-tint: var(--on-tint);
+  --color-on-chrome-tint: var(--on-chrome-tint);
+
+  /* Aliases for the roles the layout reads in terms of. */
+  --color-background: var(--ground);
+  --color-foreground: var(--ink);
+  --color-border: var(--chrome);
+  --color-accent: var(--brand);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--ground);
+  color: var(--ink);
   /*
    * The Geist variables come from the root layout; Arial is only the fallback
    * for the moment before the webfont lands.
@@ -65,7 +167,7 @@ body {
  * get the same visible ring on links, buttons, and inputs alike.
  */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--brand);
   outline-offset: 2px;
   border-radius: 0.375rem;
 }

@@ -31,15 +31,15 @@ function SelectionBar({
     <div
       className={`flex flex-wrap items-center gap-3 rounded-xl border px-4 py-2.5 shadow-sm transition-colors ${
         active
-          ? "border-violet-300 bg-violet-50 dark:border-violet-800 dark:bg-violet-950/40"
-          : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+          ? "border-brand bg-brand dark:border-brand dark:bg-brand/40"
+          : "border-chrome bg-surface dark:border-chrome dark:bg-chrome"
       }`}
     >
       <p
         className={`text-sm ${
           active
-            ? "font-medium text-violet-900 dark:text-violet-200"
-            : "text-zinc-500 dark:text-zinc-400"
+            ? "font-medium text-brand dark:text-brand"
+            : "text-muted dark:text-muted"
         }`}
       >
         {active
@@ -53,7 +53,7 @@ function SelectionBar({
             type="button"
             onClick={onClear}
             disabled={pending}
-            className="rounded-md px-2.5 py-1.5 text-sm text-zinc-600 hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="rounded-md px-2.5 py-1.5 text-sm text-muted hover:bg-ground disabled:opacity-50 dark:text-muted dark:hover:bg-chrome"
           >
             Clear
           </button>
@@ -63,7 +63,7 @@ function SelectionBar({
           type="button"
           onClick={onArchive}
           disabled={!active || pending}
-          className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:border-violet-300 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-violet-700 dark:hover:text-violet-300"
+          className="rounded-lg border border-chrome bg-surface px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-40 dark:border-chrome dark:bg-chrome dark:text-muted dark:hover:border-brand dark:hover:text-brand"
         >
           {pending ? "Working…" : "Archive"}
         </button>
@@ -72,7 +72,7 @@ function SelectionBar({
           type="button"
           onClick={onDelete}
           disabled={!active || pending}
-          className="rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-rose-900 dark:bg-zinc-900 dark:text-rose-400 dark:hover:bg-rose-700 dark:hover:text-white"
+          className="rounded-lg border border-warn bg-surface px-3 py-1.5 text-sm font-medium text-warn transition-colors hover:bg-warn/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-warn dark:bg-chrome dark:text-ink dark:hover:bg-warn dark:hover:text-white"
         >
           Delete
         </button>
@@ -171,17 +171,17 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
           role="status"
           className={`rounded-lg border px-3 py-2 text-sm ${
             notice.ok
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300"
-              : "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-300"
+              ? "border-brand bg-brand/20 text-ink dark:border-brand dark:bg-brand/30 dark:text-ink"
+              : "border-warn bg-warn/20 text-ink dark:border-warn dark:bg-warn/30 dark:text-ink"
           }`}
         >
           {notice.text}
         </p>
       ) : null}
 
-      <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="overflow-x-auto rounded-xl border border-chrome bg-surface shadow-sm dark:border-chrome dark:bg-chrome">
         <table className="w-full min-w-[64rem] text-sm">
-          <thead className="border-b border-zinc-200 bg-zinc-50/80 text-left text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-400">
+          <thead className="border-b border-chrome bg-ground/80 text-left text-xs uppercase tracking-wide text-muted dark:border-chrome dark:bg-chrome/50 dark:text-muted">
             <tr>
               <th className="w-10 px-4 py-2.5">
                 <input
@@ -193,7 +193,7 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                   }}
                   onChange={toggleAll}
                   aria-label="Select all applications"
-                  className="h-3.5 w-3.5 rounded border-zinc-300 accent-violet-600 dark:border-zinc-600"
+                  className="h-3.5 w-3.5 rounded border-chrome accent-brand dark:border-chrome"
                 />
               </th>
               <th className="px-4 py-2.5 font-medium">Role</th>
@@ -205,7 +205,7 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
               <th className="px-4 py-2.5 font-medium">Applied</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <tbody className="divide-y divide-chrome dark:divide-chrome">
             {rows.map((row) => {
               const checked = selected.has(row.id);
 
@@ -214,8 +214,8 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                   key={row.id}
                   className={`transition-colors ${
                     checked
-                      ? "bg-violet-50 dark:bg-violet-950/30"
-                      : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                      ? "bg-brand dark:bg-brand/30"
+                      : "hover:bg-ground dark:hover:bg-chrome/50"
                   }`}
                 >
                   <td className="px-4 py-3">
@@ -224,7 +224,7 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                       checked={checked}
                       onChange={() => toggleRow(row.id)}
                       aria-label={`Select ${row.title} at ${row.companyName}`}
-                      className="h-3.5 w-3.5 rounded border-zinc-300 accent-violet-600 dark:border-zinc-600"
+                      className="h-3.5 w-3.5 rounded border-chrome accent-brand dark:border-chrome"
                     />
                   </td>
                   <td className="px-4 py-3">
@@ -236,7 +236,7 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                     <span className="flex items-center gap-1.5">
                       <Link
                         href={`/applications/${row.id}`}
-                        className="font-medium text-zinc-900 transition-colors hover:text-violet-700 dark:text-zinc-100 dark:hover:text-violet-300"
+                        className="font-medium text-ink transition-colors hover:text-brand dark:text-muted dark:hover:text-brand"
                       >
                         {row.title}
                       </Link>
@@ -247,7 +247,7 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                           rel="noopener noreferrer"
                           title="Open job posting"
                           aria-label={`Open the job posting for ${row.title} at ${row.companyName} in a new tab`}
-                          className="rounded p-0.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-zinc-500 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                          className="rounded p-0.5 text-muted transition-colors hover:bg-ground hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-chrome dark:text-muted dark:hover:bg-chrome dark:hover:text-muted"
                         >
                           <ExternalLinkIcon className="h-3 w-3" />
                         </a>
@@ -256,14 +256,14 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                     {row.source ? (
                       <Link
                         href={`/applications/${row.id}`}
-                        className="block text-xs text-zinc-500 dark:text-zinc-400"
+                        className="block text-xs text-muted dark:text-muted"
                       >
                         {row.source}
                       </Link>
                     ) : null}
                     <TagList tags={row.tags} className="mt-1.5" />
                   </td>
-                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                  <td className="px-4 py-3 text-muted dark:text-muted">
                     <span className="inline-flex items-center gap-1">
                       {row.companyName}
                       <ContactsHint
@@ -275,21 +275,21 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                   <td className="px-4 py-3">
                     <StatusBadge status={row.status} />
                     {row.nextInterviewAt ? (
-                      <span className="mt-1 inline-flex items-center gap-1 rounded-md bg-violet-50 px-1.5 py-0.5 text-xs font-medium text-violet-700 ring-1 ring-inset ring-violet-200 dark:bg-violet-950/60 dark:text-violet-300 dark:ring-violet-900">
+                      <span className="mt-1 inline-flex items-center gap-1 rounded-md bg-brand/20 px-1.5 py-0.5 text-xs font-medium text-ink ring-1 ring-inset ring-brand dark:bg-brand/30 dark:text-ink dark:ring-brand">
                         <CalendarIcon className="h-3 w-3" />
                         {formatDateTime(row.nextInterviewAt)}
                       </span>
                     ) : null}
                   </td>
-                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                  <td className="px-4 py-3 text-muted dark:text-muted">
                     {row.location ?? "—"}
                     {row.remoteType ? (
-                      <span className="block text-xs text-zinc-400 dark:text-zinc-500">
+                      <span className="block text-xs text-muted dark:text-muted">
                         {row.remoteType}
                       </span>
                     ) : null}
                   </td>
-                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                  <td className="px-4 py-3 text-muted dark:text-muted">
                     {row.sponsorship ? (
                       <SponsorshipBadge sponsorship={row.sponsorship} />
                     ) : (
@@ -298,14 +298,14 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
                     {formatSalary(row.salaryMin, row.salaryMax, row.currency) ? (
-                      <span className="font-medium text-emerald-700 dark:text-emerald-400">
+                      <span className="font-medium text-brand dark:text-brand">
                         {formatSalary(row.salaryMin, row.salaryMax, row.currency)}
                       </span>
                     ) : (
-                      <span className="text-zinc-600 dark:text-zinc-400">—</span>
+                      <span className="text-muted dark:text-muted">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                  <td className="px-4 py-3 text-muted dark:text-muted">
                     {formatDate(row.appliedAt)}
                   </td>
                 </tr>

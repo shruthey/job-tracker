@@ -1,5 +1,5 @@
 import type { Sponsorship } from "@/db/schema";
-import { SPONSORSHIP_LABELS, SPONSORSHIP_STYLES } from "@/lib/format";
+import { SPONSORSHIP_LABELS, sponsorshipChipStyle } from "@/lib/format";
 
 /**
  * Renders nothing when the posting never said, which is the common case —
@@ -17,7 +17,8 @@ export function SponsorshipBadge({
 
   return (
     <span
-      className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${SPONSORSHIP_STYLES[sponsorship]} ${className}`}
+      className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${className}`}
+      style={sponsorshipChipStyle(sponsorship)}
     >
       {SPONSORSHIP_LABELS[sponsorship]}
     </span>

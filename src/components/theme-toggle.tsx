@@ -108,7 +108,7 @@ export function ThemeToggle() {
       aria-checked={isDark}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       title={isDark ? "Switch to light theme" : "Switch to dark theme"}
-      className="rounded-md p-2 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+      className="rounded-md p-2 text-muted transition-colors hover:bg-ground hover:text-ink dark:text-muted dark:hover:bg-chrome dark:hover:text-muted"
     >
       {isDark ? <SunIcon /> : <MoonIcon />}
     </button>

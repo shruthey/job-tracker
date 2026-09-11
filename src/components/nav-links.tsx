@@ -33,8 +33,8 @@ export function NavLinks() {
             aria-current={active ? "page" : undefined}
             className={`rounded-lg px-3 py-1.5 text-sm transition-colors ${
               active
-                ? "bg-violet-100 font-medium text-violet-700 dark:bg-violet-950/60 dark:text-violet-300"
-                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                ? "bg-brand/20 font-medium text-ink dark:bg-brand/30 dark:text-ink"
+                : "text-muted hover:bg-ground hover:text-ink dark:text-muted dark:hover:bg-chrome dark:hover:text-muted"
             }`}
           >
             {item.label}

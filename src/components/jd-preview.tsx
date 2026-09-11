@@ -26,13 +26,13 @@ export function JdPreview({
       {value.trim() ? (
         <div
           id={id}
-          className="max-h-96 w-full overflow-y-auto whitespace-pre-wrap rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs leading-relaxed text-zinc-800 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200"
+          className="max-h-96 w-full overflow-y-auto whitespace-pre-wrap rounded-md border border-chrome bg-ground px-3 py-2 text-xs leading-relaxed text-ink dark:border-chrome dark:bg-chrome dark:text-muted"
         >
           {segments.map((segment, i) =>
             segment.emphasis ? (
               <strong
                 key={i}
-                className="font-semibold text-zinc-950 dark:text-zinc-50"
+                className="font-semibold text-ink dark:text-muted"
               >
                 {segment.text}
               </strong>
@@ -44,7 +44,7 @@ export function JdPreview({
       ) : (
         <p
           id={id}
-          className="rounded-md border border-dashed border-zinc-300 px-3 py-4 text-center text-xs text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+          className="rounded-md border border-dashed border-chrome px-3 py-4 text-center text-xs text-muted dark:border-chrome dark:text-muted"
         >
           No description.
         </p>

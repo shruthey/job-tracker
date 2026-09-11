@@ -12,13 +12,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         which scrolls both ways. The blur keeps the tinted page ground visible
         through the bar instead of capping it with a flat white slab.
       */}
-      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/80 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/80">
+      <header className="sticky top-0 z-30 border-b border-chrome/80 bg-surface/80 backdrop-blur-md dark:border-chrome/80 dark:bg-chrome/80">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-6 py-3">
           <Link href="/board" className="flex items-center gap-2">
             {/* The same mark as the browser tab, in the brand gradient, so the
                 tab and the page read as one product. */}
             <BrandMark />
-            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-sm font-semibold tracking-tight text-transparent dark:from-violet-300 dark:to-indigo-300">
+            <span className="bg-gradient-to-r from-brand to-brand bg-clip-text text-sm font-semibold tracking-tight text-transparent dark:from-brand dark:to-brand">
               Job Tracker
             </span>
           </Link>
@@ -29,13 +29,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <ThemeToggle />
             <Link
               href="/applications/import"
-              className="rounded-lg border border-violet-200 px-3 py-1.5 text-sm font-medium text-violet-700 transition-colors hover:border-violet-300 hover:bg-violet-50 dark:border-violet-900 dark:text-violet-300 dark:hover:border-violet-700 dark:hover:bg-violet-950/50"
+              className="rounded-lg border border-brand px-3 py-1.5 text-sm font-medium text-brand transition-colors hover:border-brand hover:bg-brand/20 dark:border-brand dark:text-ink dark:hover:border-brand dark:hover:bg-brand/50"
             >
               Import from JD
             </Link>
             <Link
               href="/applications/new"
-              className="rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35"
+              className="rounded-lg bg-gradient-to-br from-brand to-brand px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-brand/25 transition-shadow hover:shadow-md hover:shadow-brand/35"
             >
               New application
             </Link>

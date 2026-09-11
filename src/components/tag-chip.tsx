@@ -1,10 +1,11 @@
 import type { ApplicationTag } from "@/db/schema";
-import { TAG_LABELS, TAG_STYLES } from "@/lib/format";
+import { TAG_LABELS, tagChipStyle } from "@/lib/format";
 
 export function TagChip({ tag }: { tag: ApplicationTag }) {
   return (
     <span
-      className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${TAG_STYLES[tag]}`}
+      className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium"
+      style={tagChipStyle(tag)}
     >
       {TAG_LABELS[tag]}
     </span>

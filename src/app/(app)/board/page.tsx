@@ -13,10 +13,10 @@ export default async function BoardPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-xl font-semibold tracking-tight text-ink dark:text-muted">
           Board
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted dark:text-muted">
           Drag a card to change its status.
         </p>
       </div>

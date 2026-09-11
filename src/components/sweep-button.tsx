@@ -11,7 +11,7 @@ export function SweepButton() {
   return (
     <div className="flex items-center gap-3">
       {message ? (
-        <span className="text-xs text-zinc-500 dark:text-zinc-400">{message}</span>
+        <span className="text-xs text-muted dark:text-muted">{message}</span>
       ) : null}
       <button
         type="button"
@@ -24,7 +24,7 @@ export function SweepButton() {
             );
           })
         }
-        className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 shadow-sm transition-colors hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-violet-700 dark:hover:text-violet-300"
+        className="rounded-lg border border-chrome bg-surface px-3 py-1.5 text-sm font-medium text-ink shadow-sm transition-colors hover:border-brand hover:text-brand disabled:opacity-50 dark:border-chrome dark:bg-chrome dark:text-muted dark:hover:border-brand dark:hover:text-brand"
       >
         {pending ? "Checking…" : "Run stale check"}
       </button>

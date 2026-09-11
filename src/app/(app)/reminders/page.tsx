@@ -22,31 +22,31 @@ export default async function RemindersPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-xl font-semibold tracking-tight text-ink dark:text-muted">
             Reminders
           </h1>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-muted dark:text-muted">
             Applications with no movement in {DEFAULT_STALE_DAYS} days.
           </p>
         </div>
         <SweepButton />
       </div>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+      <section className="rounded-xl border border-chrome bg-surface p-5 shadow-sm dark:border-chrome dark:bg-chrome">
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink dark:text-muted">
           Due now
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ${
               due.length > 0
-                ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-                : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                ? "bg-attn/20 text-ink dark:bg-attn/20 dark:text-ink"
+                : "bg-ground text-muted dark:bg-chrome dark:text-muted"
             }`}
           >
             {due.length}
           </span>
         </h2>
         {due.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted dark:text-muted">
             Nothing due.
           </p>
         ) : (
@@ -54,23 +54,23 @@ export default async function RemindersPage() {
             {due.map((r) => (
               <li
                 key={r.id}
-                className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2 transition-colors hover:bg-amber-50 dark:border-amber-900/70 dark:bg-amber-950/25 dark:hover:bg-amber-950/40"
+                className="flex items-center justify-between gap-3 rounded-lg border border-attn bg-attn/60 px-3 py-2 transition-colors hover:bg-attn dark:border-attn/70 dark:bg-attn/25 dark:hover:bg-attn/40"
               >
                 <div className="min-w-0">
                   <Link
                     href={`/applications/${r.applicationId}`}
-                    className="text-sm font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+                    className="text-sm font-medium text-ink hover:underline dark:text-muted"
                   >
                     {r.title} · {r.companyName}
                   </Link>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="text-xs text-muted dark:text-muted">
                     {r.message ?? r.kind} · due {formatDate(r.dueAt)}
                   </p>
                 </div>
                 <form action={dismissReminder.bind(null, r.id)}>
                   <button
                     type="submit"
-                    className="shrink-0 rounded-lg border border-amber-300 bg-white px-2.5 py-1 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-zinc-900 dark:text-amber-300 dark:hover:bg-amber-950"
+                    className="shrink-0 rounded-lg border border-attn bg-surface px-2.5 py-1 text-xs font-medium text-attn transition-colors hover:bg-attn/20 dark:border-attn dark:bg-chrome dark:text-ink dark:hover:bg-attn"
                   >
                     Dismiss
                   </button>
@@ -81,30 +81,30 @@ export default async function RemindersPage() {
         )}
       </section>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+      <section className="rounded-xl border border-chrome bg-surface p-5 shadow-sm dark:border-chrome dark:bg-chrome">
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink dark:text-muted">
           Going quiet
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ${
               stale.length > 0
-                ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
-                : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                ? "bg-warn/20 text-ink dark:bg-warn/20 dark:text-ink"
+                : "bg-ground text-muted dark:bg-chrome dark:text-muted"
             }`}
           >
             {stale.length}
           </span>
         </h2>
         {stale.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted dark:text-muted">
             Every open application has moved recently.
           </p>
         ) : (
-          <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <ul className="divide-y divide-chrome dark:divide-chrome">
             {stale.map((app) => (
               <li key={app.id} className="flex items-center justify-between gap-3 py-2">
                 <Link
                   href={`/applications/${app.id}`}
-                  className="text-sm text-zinc-900 transition-colors hover:text-violet-700 hover:underline dark:text-zinc-100 dark:hover:text-violet-300"
+                  className="text-sm text-ink transition-colors hover:text-brand hover:underline dark:text-muted dark:hover:text-brand"
                 >
                   {app.title} · {app.companyName}
                 </Link>
@@ -112,8 +112,8 @@ export default async function RemindersPage() {
                 <span
                   className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-medium tabular-nums ${
                     app.daysSince >= 30
-                      ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
-                      : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                      ? "bg-warn/20 text-ink dark:bg-warn/20 dark:text-ink"
+                      : "bg-attn/20 text-ink dark:bg-attn/20 dark:text-ink"
                   }`}
                 >
                   {app.daysSince}d since {relativeDays(app.lastEventAt)}

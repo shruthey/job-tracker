@@ -94,28 +94,16 @@ export const applicationTag = pgEnum("application_tag", [
 
 export type ApplicationTag = (typeof applicationTag.enumValues)[number];
 
-/**
- * Every tag, in the order they should appear in pickers and on cards.
+/*
+ * Display order, labels, and colours all live in one table — `TAGS` in
+ * `@/lib/format`, which `TAG_ORDER` and `TAG_LABELS` are derived from. The
+ * enum above is only the stored vocabulary.
  *
- * The three referral tags lead and share a colour family because they are a
- * progression: `need_referral` is "this role wants one and I haven't asked
- * anyone yet", `referral_requested` is "I asked", `referral_given` is "someone
- * came through". Only the first is a to-do.
+ * The three referral tags lead there and share a colour family because they
+ * are a progression: `need_referral` is "this role wants one and I haven't
+ * asked anyone yet", `referral_requested` is "I asked", `referral_given` is
+ * "someone came through". Only the first is a to-do.
  */
-export const TAG_ORDER = [
-  "need_referral",
-  "referral_requested",
-  "referral_given",
-  "recruiter_reachout",
-  "online_assessment",
-  "take_home",
-  "screening_call",
-  "tech_screen",
-  "system_design",
-  "panel_round",
-  "offer_negotiation",
-  "needs_follow_up",
-] as const satisfies readonly ApplicationTag[];
 
 /**
  * Which tags make sense in which status. A tag is offered only where it could

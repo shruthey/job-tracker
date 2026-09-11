@@ -39,7 +39,7 @@ export default async function ApplicationDetailPage(
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-            <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <h1 className="text-xl font-semibold tracking-tight text-ink dark:text-muted">
               {application.title}
             </h1>
             {application.jobUrl ? (
@@ -49,20 +49,20 @@ export default async function ApplicationDetailPage(
                 rel="noopener noreferrer"
                 title="Open job posting"
                 aria-label={`Open the job posting for ${application.title} at ${application.companyName} in a new tab`}
-                className="-ml-1.5 rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-zinc-500 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                className="-ml-1.5 rounded p-1.5 text-muted transition-colors hover:bg-ground hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-chrome dark:text-muted dark:hover:bg-chrome dark:hover:text-muted"
               >
                 <ExternalLinkIcon className="h-4 w-4" />
               </a>
             ) : null}
             <StatusBadge status={application.status} />
           </div>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-muted dark:text-muted">
             {application.companyWebsite ? (
               <a
                 href={application.companyWebsite}
                 target="_blank"
                 rel="noreferrer"
-                className="underline hover:text-zinc-900 dark:hover:text-zinc-100"
+                className="underline hover:text-ink dark:hover:text-muted"
               >
                 {application.companyName}
               </a>
@@ -77,7 +77,7 @@ export default async function ApplicationDetailPage(
           <form action={archive}>
             <button
               type="submit"
-              className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-rose-800 dark:hover:bg-rose-950 dark:hover:text-rose-300"
+              className="rounded-lg border border-chrome bg-surface px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:border-warn hover:bg-warn/20 hover:text-ink dark:border-chrome dark:bg-chrome dark:text-muted dark:hover:border-warn dark:hover:bg-warn/20 dark:hover:text-ink"
             >
               Archive
             </button>
@@ -87,8 +87,8 @@ export default async function ApplicationDetailPage(
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          <section className="rounded-xl border border-chrome bg-surface p-5 shadow-sm dark:border-chrome dark:bg-chrome">
+            <h2 className="mb-3 text-sm font-semibold text-ink dark:text-muted">
               Tags
             </h2>
             <TagPicker
@@ -98,7 +98,7 @@ export default async function ApplicationDetailPage(
             />
           </section>
 
-          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-xl border border-chrome bg-surface p-6 shadow-sm dark:border-chrome dark:bg-chrome">
             <ApplicationForm
               action={action}
               submitLabel="Save changes"
@@ -126,26 +126,26 @@ export default async function ApplicationDetailPage(
 
           <DocumentsPanel applicationId={id} documents={docs} />
 
-          <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          <section className="rounded-xl border border-chrome bg-surface p-5 shadow-sm dark:border-chrome dark:bg-chrome">
+            <h2 className="mb-3 text-sm font-semibold text-ink dark:text-muted">
               Status history
             </h2>
             {history.length === 0 ? (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm text-muted dark:text-muted">
                 No transitions recorded.
               </p>
             ) : (
               <ol className="flex flex-col gap-3">
                 {history.map((event) => (
                   <li key={event.id} className="flex gap-3 text-sm">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-400 dark:bg-zinc-600" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-chrome dark:bg-chrome" />
                     <div>
-                      <p className="text-zinc-900 dark:text-zinc-100">
+                      <p className="text-ink dark:text-muted">
                         {event.fromStatus
                           ? `${STATUS_LABELS[event.fromStatus]} → ${STATUS_LABELS[event.toStatus]}`
                           : `Created as ${STATUS_LABELS[event.toStatus]}`}
                       </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="text-xs text-muted dark:text-muted">
                         {formatDate(event.occurredAt)}
                         {event.source !== "manual" ? ` · ${event.source}` : ""}
                       </p>
@@ -158,7 +158,7 @@ export default async function ApplicationDetailPage(
 
           <Link
             href="/applications"
-            className="text-sm text-zinc-500 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="text-sm text-muted underline hover:text-ink dark:text-muted dark:hover:text-muted"
           >
             ← Back to all applications
           </Link>

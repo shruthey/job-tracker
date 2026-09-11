@@ -18,35 +18,35 @@ export function JdImport() {
     const d = state.data;
     return (
       <div className="flex flex-col gap-4">
-        <div className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+        <div className="rounded-md bg-brand/20 px-3 py-2 text-sm text-ink dark:bg-brand/20 dark:text-ink">
           Extracted from the posting. Review every field before saving.
         </div>
 
         {(d.requiredSkills.length > 0 ||
           d.niceToHaveSkills.length > 0 ||
           d.sponsorship !== null) && (
-          <div className="flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex flex-col gap-2 rounded-lg border border-chrome bg-surface p-4 text-sm dark:border-chrome dark:bg-chrome">
             {d.seniority ? (
-              <p className="text-zinc-600 dark:text-zinc-400">
+              <p className="text-muted dark:text-muted">
                 Seniority: <span className="font-medium">{d.seniority}</span>
               </p>
             ) : null}
             {d.sponsorship ? (
-              <p className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
+              <p className="flex items-center gap-2 text-muted dark:text-muted">
                 Sponsorship:
                 <SponsorshipBadge sponsorship={d.sponsorship} />
               </p>
             ) : null}
             {d.requiredSkills.length > 0 ? (
               <div>
-                <p className="mb-1 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                <p className="mb-1 text-xs font-medium text-ink dark:text-muted">
                   Required
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {d.requiredSkills.map((s) => (
                     <span
                       key={s}
-                      className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                      className="rounded-full bg-ground px-2 py-0.5 text-xs text-ink dark:bg-chrome dark:text-muted"
                     >
                       {s}
                     </span>
@@ -56,14 +56,14 @@ export function JdImport() {
             ) : null}
             {d.niceToHaveSkills.length > 0 ? (
               <div>
-                <p className="mb-1 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                <p className="mb-1 text-xs font-medium text-ink dark:text-muted">
                   Nice to have
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {d.niceToHaveSkills.map((s) => (
                     <span
                       key={s}
-                      className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                      className="rounded-full bg-ground px-2 py-0.5 text-xs text-muted dark:bg-chrome dark:text-muted"
                     >
                       {s}
                     </span>
@@ -74,7 +74,7 @@ export function JdImport() {
           </div>
         )}
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-xl border border-chrome bg-surface p-6 shadow-sm dark:border-chrome dark:bg-chrome">
           <ApplicationForm
             action={createApplicationFromJd}
             submitLabel="Create application"
@@ -103,7 +103,7 @@ export function JdImport() {
       <div className="flex flex-col gap-2">
         <label
           htmlFor="jdText"
-          className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
+          className="text-xs font-medium text-ink dark:text-muted"
         >
           Paste the job description
         </label>
@@ -115,12 +115,12 @@ export function JdImport() {
           autoFocus
           defaultValue={state.jdRaw ?? ""}
           placeholder="Paste the full posting here…"
-          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 font-mono text-xs text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+          className="w-full rounded-md border border-chrome bg-surface px-3 py-2 font-mono text-xs text-ink dark:border-chrome dark:bg-chrome dark:text-muted"
         />
       </div>
 
       {state.message ? (
-        <p className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-800 dark:bg-rose-950 dark:text-rose-300">
+        <p className="rounded-md bg-warn/20 px-3 py-2 text-sm text-ink dark:bg-warn/20 dark:text-ink">
           {state.message}
         </p>
       ) : null}
@@ -128,7 +128,7 @@ export function JdImport() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90 disabled:opacity-50"
         >
           {pending ? "Parsing…" : "Parse posting"}
         </button>

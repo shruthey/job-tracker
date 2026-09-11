@@ -23,7 +23,7 @@ type Values = Partial<{
 }>;
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
+  "w-full rounded-lg border border-chrome bg-surface px-3 py-2 text-sm text-ink transition-colors placeholder:text-muted focus:border-brand dark:border-chrome dark:bg-chrome dark:text-muted";
 
 function Field({
   label,
@@ -43,16 +43,16 @@ function Field({
       <label
         id={`${htmlFor}-label`}
         htmlFor={htmlFor}
-        className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
+        className="text-xs font-medium text-ink dark:text-muted"
       >
         {label}
       </label>
       {children}
       {hint ? (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">{hint}</p>
+        <p className="text-xs text-muted dark:text-muted">{hint}</p>
       ) : null}
       {errors?.length ? (
-        <p className="text-xs text-rose-600 dark:text-rose-400">{errors[0]}</p>
+        <p className="text-xs text-warn dark:text-warn">{errors[0]}</p>
       ) : null}
     </div>
   );
@@ -125,8 +125,8 @@ export function ApplicationForm({
         <p
           className={`rounded-md px-3 py-2 text-sm ${
             state.ok
-              ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-              : "bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+              ? "bg-brand/20 text-ink dark:bg-brand/20 dark:text-ink"
+              : "bg-warn/20 text-ink dark:bg-warn/20 dark:text-ink"
           }`}
         >
           {state.message}
@@ -266,13 +266,13 @@ export function ApplicationForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35 disabled:opacity-50 disabled:shadow-none"
+          className="rounded-lg bg-gradient-to-br from-brand to-brand px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand/25 transition-shadow hover:shadow-md hover:shadow-brand/35 disabled:opacity-50 disabled:shadow-none"
         >
           {pending ? "Saving…" : submitLabel}
         </button>
         <Link
           href={cancelHref}
-          className="rounded-md px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+          className="rounded-md px-4 py-2 text-sm text-muted hover:bg-ground dark:text-muted dark:hover:bg-chrome"
         >
           Cancel
         </Link>

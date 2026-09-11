@@ -33,10 +33,10 @@ export default async function ApplicationsPage(props: PageProps<"/applications">
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-xl font-semibold tracking-tight text-ink dark:text-muted">
           Applications
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted dark:text-muted">
           {rows.length} {rows.length === 1 ? "result" : "results"}
         </p>
       </div>
@@ -44,26 +44,26 @@ export default async function ApplicationsPage(props: PageProps<"/applications">
       {/* GET form: filters live in the URL, so the view is shareable and
           survives a refresh without any client state. */}
       <form
-        className="flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+        className="flex flex-wrap items-end gap-3 rounded-xl border border-chrome bg-surface p-4 shadow-sm dark:border-chrome dark:bg-chrome"
         method="get"
       >
-        <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+        <label className="flex flex-col gap-1 text-xs font-medium text-muted dark:text-muted">
           Search
           <input
             type="search"
             name="q"
             defaultValue={q ?? ""}
             placeholder="Title or company"
-            className="w-56 rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 transition-colors focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className="w-56 rounded-lg border border-chrome bg-surface px-2.5 py-1.5 text-sm text-ink transition-colors focus:border-brand dark:border-chrome dark:bg-chrome dark:text-muted"
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+        <label className="flex flex-col gap-1 text-xs font-medium text-muted dark:text-muted">
           Status
           <select
             name="status"
             defaultValue={status ?? ""}
-            className="rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 transition-colors focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className="rounded-lg border border-chrome bg-surface px-2.5 py-1.5 text-sm text-ink transition-colors focus:border-brand dark:border-chrome dark:bg-chrome dark:text-muted"
           >
             <option value="">All</option>
             {applicationStatus.enumValues.map((s) => (
@@ -74,12 +74,12 @@ export default async function ApplicationsPage(props: PageProps<"/applications">
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+        <label className="flex flex-col gap-1 text-xs font-medium text-muted dark:text-muted">
           Company
           <select
             name="company"
             defaultValue={companyParam ?? ""}
-            className="rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 transition-colors focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className="rounded-lg border border-chrome bg-surface px-2.5 py-1.5 text-sm text-ink transition-colors focus:border-brand dark:border-chrome dark:bg-chrome dark:text-muted"
           >
             <option value="">All</option>
             {companies.map((c) => (
@@ -90,12 +90,12 @@ export default async function ApplicationsPage(props: PageProps<"/applications">
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+        <label className="flex flex-col gap-1 text-xs font-medium text-muted dark:text-muted">
           Created
           <select
             name="since"
             defaultValue={sinceParam ?? ""}
-            className="rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 transition-colors focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className="rounded-lg border border-chrome bg-surface px-2.5 py-1.5 text-sm text-ink transition-colors focus:border-brand dark:border-chrome dark:bg-chrome dark:text-muted"
           >
             {RANGES.map((r) => (
               <option key={r.value} value={r.value}>
@@ -107,26 +107,26 @@ export default async function ApplicationsPage(props: PageProps<"/applications">
 
         <button
           type="submit"
-          className="rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35"
+          className="rounded-lg bg-gradient-to-br from-brand to-brand px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-brand/25 transition-shadow hover:shadow-md hover:shadow-brand/35"
         >
           Filter
         </button>
         <Link
           href="/applications"
-          className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-violet-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-violet-300"
+          className="rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:bg-ground hover:text-brand dark:text-muted dark:hover:bg-chrome dark:hover:text-brand"
         >
           Reset
         </Link>
       </form>
 
       {rows.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-violet-300 bg-violet-50/40 p-12 text-center dark:border-violet-900 dark:bg-violet-950/20">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="rounded-xl border border-dashed border-brand bg-brand/40 p-12 text-center dark:border-brand dark:bg-brand/20">
+          <p className="text-sm text-muted dark:text-muted">
             No applications match these filters.
           </p>
           <Link
             href="/applications/new"
-            className="mt-3 inline-block rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-violet-600/25 transition-shadow hover:shadow-md hover:shadow-violet-600/35"
+            className="mt-3 inline-block rounded-lg bg-gradient-to-br from-brand to-brand px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-brand/25 transition-shadow hover:shadow-md hover:shadow-brand/35"
           >
             Add one
           </Link>

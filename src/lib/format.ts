@@ -1,4 +1,10 @@
-import type { ApplicationStatus, ApplicationTag, Sponsorship } from "@/db/schema";
+import type { CSSProperties } from "react";
+
+import type {
+  ApplicationStatus,
+  ApplicationTag,
+  Sponsorship,
+} from "@/db/schema";
 
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   saved: "Saved",
@@ -12,158 +18,219 @@ export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   ghosted: "Ghosted",
 };
 
-/** Tailwind classes per status. Kept together so the board and list agree. */
-export const STATUS_STYLES: Record<ApplicationStatus, string> = {
-  saved: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  applied: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  screen: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300",
-  interview: "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300",
-  onsite: "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300",
-  offer: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-  rejected: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
-  withdrawn: "bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
-  ghosted: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300",
+/*
+ * The app has five colours and no lighter or darker steps of them, so a status
+ * cannot be given a shade of its own. Two devices carry the nine statuses
+ * instead:
+ *
+ *   hue       which of the five it is — brand for the live funnel, attn for an
+ *             offer, warn for an ending, chrome for the inert states
+ *   strength  how much of that hue is mixed with the page behind it, which is
+ *             what separates the four funnel stages from each other
+ *
+ * These are inline styles rather than Tailwind classes on purpose: the values
+ * are computed per status, and Tailwind only emits utilities whose class names
+ * it can read literally in the source. A class built by string interpolation
+ * would scan as nothing and compile to nothing.
+ *
+ * Mixing toward `--ground` rather than using alpha keeps every chip opaque, so
+ * a badge on a tinted board column is not doubly tinted by what is behind it.
+ * All of it is expressed in `var()`, so both themes and any palette change are
+ * picked up without a second table.
+ */
+const mix = (color: string, pct: number) =>
+  `color-mix(in oklab, var(${color}) ${pct}%, var(--ground))`;
+
+/**
+ * A chip's fill. The percentage is a *relative* strength — where this status
+ * sits between the weakest and strongest chip — not an absolute amount of
+ * hue, because the two themes need different absolute ranges: on a pale page
+ * a 20% tint already carries dark text, while on a dark page the same tint is
+ * a mid-tone nothing reads against. `--chip-floor` and `--chip-span` set that
+ * range per theme, so one table of strengths drives both.
+ */
+const chipFill = (color: string, strength: number) =>
+  `color-mix(in oklab, var(${color}) ` +
+  `calc(var(--chip-floor) + ${strength / 100} * var(--chip-span)), var(--chip-base))`;
+
+/**
+ * Text for a chip. Chips built from `--chrome` need their own value: chrome is
+ * the one palette colour that is pale in one theme and dark in the other, so
+ * its chip lands on the opposite side of the light/dark split from the rest.
+ */
+const chipText = (color: string) =>
+  color === "--color-chrome" ? "var(--on-chrome-tint)" : "var(--on-tint)";
+
+/** Per status: which of the five hues it takes, and how strong the fill is. */
+const STATUS_HUE: Record<
+  ApplicationStatus,
+  { color: string; strength: number }
+> = {
+  saved: { color: "--color-chrome", strength: 45 },
+  applied: { color: "--color-brand", strength: 22 },
+  screen: { color: "--color-brand", strength: 38 },
+  interview: { color: "--color-brand", strength: 54 },
+  onsite: { color: "--color-brand", strength: 72 },
+  offer: { color: "--color-attn", strength: 70 },
+  rejected: { color: "--color-warn", strength: 45 },
+  withdrawn: { color: "--color-chrome", strength: 70 },
+  ghosted: { color: "--color-warn", strength: 22 },
 };
 
 /**
- * The column chrome on the board — surface, border, and the rail that runs
- * down each company group. Separate from STATUS_STYLES because a badge sits on
- * a card and needs contrast, while a column is a large field behind cards and
- * has to stay quiet enough for white cards to read as raised above it.
+ * The badge on a card or table row. Text is always `--ink`: a tinted chip has
+ * no darker shade of its own hue to put text in, and `--ink` is the one value
+ * guaranteed to read against all five.
  */
-export const STATUS_COLUMN_STYLES: Record<ApplicationStatus, string> = {
-  saved: "border-zinc-200 bg-zinc-100/70 dark:border-zinc-800 dark:bg-zinc-900/50",
-  applied: "border-blue-200 bg-blue-50/70 dark:border-blue-900/60 dark:bg-blue-950/25",
-  screen: "border-cyan-200 bg-cyan-50/70 dark:border-cyan-900/60 dark:bg-cyan-950/25",
-  interview:
-    "border-violet-200 bg-violet-50/70 dark:border-violet-900/60 dark:bg-violet-950/25",
-  onsite: "border-amber-200 bg-amber-50/70 dark:border-amber-900/60 dark:bg-amber-950/25",
-  offer:
-    "border-emerald-200 bg-emerald-50/70 dark:border-emerald-900/60 dark:bg-emerald-950/25",
-  rejected: "border-rose-200 bg-rose-50/60 dark:border-rose-900/60 dark:bg-rose-950/20",
-  withdrawn: "border-zinc-200 bg-zinc-100/70 dark:border-zinc-800 dark:bg-zinc-900/50",
-  ghosted:
-    "border-orange-200 bg-orange-50/60 dark:border-orange-900/60 dark:bg-orange-950/20",
-};
-
-/** The same hues at drop-target strength, for the column being dragged over. */
-export const STATUS_COLUMN_OVER_STYLES: Record<ApplicationStatus, string> = {
-  saved: "border-zinc-400 bg-zinc-200/80 dark:border-zinc-500 dark:bg-zinc-800",
-  applied: "border-blue-400 bg-blue-100/80 dark:border-blue-600 dark:bg-blue-950/60",
-  screen: "border-cyan-400 bg-cyan-100/80 dark:border-cyan-600 dark:bg-cyan-950/60",
-  interview:
-    "border-violet-400 bg-violet-100/80 dark:border-violet-600 dark:bg-violet-950/60",
-  onsite: "border-amber-400 bg-amber-100/80 dark:border-amber-600 dark:bg-amber-950/60",
-  offer:
-    "border-emerald-400 bg-emerald-100/80 dark:border-emerald-600 dark:bg-emerald-950/60",
-  rejected: "border-rose-400 bg-rose-100/80 dark:border-rose-600 dark:bg-rose-950/60",
-  withdrawn: "border-zinc-400 bg-zinc-200/80 dark:border-zinc-500 dark:bg-zinc-800",
-  ghosted:
-    "border-orange-400 bg-orange-100/80 dark:border-orange-600 dark:bg-orange-950/60",
-};
+export function statusBadgeStyle(status: ApplicationStatus): CSSProperties {
+  const { color, strength } = STATUS_HUE[status];
+  return { backgroundColor: chipFill(color, strength), color: chipText(color) };
+}
 
 /**
- * The left rail and header bar on a company group, tinted to its column so a
- * group reads as belonging to the stage around it.
+ * The column chrome on the board. Far weaker than the badge because a column
+ * is a large field behind cards and has to stay quiet enough for cards to read
+ * as raised above it; the border is the same hue at roughly triple strength so
+ * the column still has a defined edge.
  */
-export const STATUS_RAIL_STYLES: Record<ApplicationStatus, string> = {
-  saved: "border-zinc-400 dark:border-zinc-600",
-  applied: "border-blue-400 dark:border-blue-600",
-  screen: "border-cyan-400 dark:border-cyan-600",
-  interview: "border-violet-400 dark:border-violet-600",
-  onsite: "border-amber-400 dark:border-amber-600",
-  offer: "border-emerald-400 dark:border-emerald-600",
-  rejected: "border-rose-400 dark:border-rose-600",
-  withdrawn: "border-zinc-400 dark:border-zinc-600",
-  ghosted: "border-orange-400 dark:border-orange-600",
-};
+export function statusColumnStyle(
+  status: ApplicationStatus,
+  isOver: boolean,
+): CSSProperties {
+  const { color, strength } = STATUS_HUE[status];
+  const fill = Math.round(strength * (isOver ? 0.55 : 0.22));
+  return {
+    backgroundColor: mix(color, fill),
+    borderColor: mix(color, Math.min(fill * 3, 60)),
+  };
+}
+
+/**
+ * A line in the status hue — the rail down a company group, and the card's
+ * left edge. Lines are thin, so they take the hue at close to full strength
+ * where a field would be far too loud.
+ */
+export function statusLineStyle(status: ApplicationStatus): CSSProperties {
+  const { color, strength } = STATUS_HUE[status];
+  return { borderColor: mix(color, Math.min(strength + 30, 100)) };
+}
 
 /**
  * A single dot in the status hue, for places that need the colour without the
  * weight of a full badge — menu rows, legends, a table's leading marker.
  */
-export const STATUS_DOT_STYLES: Record<ApplicationStatus, string> = {
-  saved: "bg-zinc-400",
-  applied: "bg-blue-500",
-  screen: "bg-cyan-500",
-  interview: "bg-violet-500",
-  onsite: "bg-amber-500",
-  offer: "bg-emerald-500",
-  rejected: "bg-rose-500",
-  withdrawn: "bg-zinc-500",
-  ghosted: "bg-orange-500",
-};
+export function statusDotStyle(status: ApplicationStatus): CSSProperties {
+  const { color, strength } = STATUS_HUE[status];
+  return { backgroundColor: mix(color, Math.min(strength + 30, 100)) };
+}
 
 /**
- * The card's left edge, in its column's hue. A card sits on a tinted column
- * and was previously white-on-near-white from every angle; this gives each
- * tile one saturated edge so it has a defined boundary at rest, without
- * tinting the whole surface and hurting the text contrast on top of it.
+ * Fills for charts. Same two devices as the badges, at full strength since a
+ * bar carries no text: the hue says which kind of state it is, the strength
+ * separates the funnel stages so the funnel reads as deepening left to right.
  */
-export const STATUS_CARD_EDGE_STYLES: Record<ApplicationStatus, string> = {
-  saved: "border-l-zinc-400 dark:border-l-zinc-500",
-  applied: "border-l-blue-500 dark:border-l-blue-400",
-  screen: "border-l-cyan-500 dark:border-l-cyan-400",
-  interview: "border-l-violet-500 dark:border-l-violet-400",
-  onsite: "border-l-amber-500 dark:border-l-amber-400",
-  offer: "border-l-emerald-500 dark:border-l-emerald-400",
-  rejected: "border-l-rose-500 dark:border-l-rose-400",
-  withdrawn: "border-l-zinc-400 dark:border-l-zinc-500",
-  ghosted: "border-l-orange-500 dark:border-l-orange-400",
-};
-
-/** Solid fills for charts, one per status, matching the badge hues above. */
-export const STATUS_CHART_COLORS: Record<ApplicationStatus, string> = {
-  saved: "#a1a1aa",
-  applied: "#3b82f6",
-  screen: "#06b6d4",
-  interview: "#8b5cf6",
-  onsite: "#f59e0b",
-  offer: "#10b981",
-  rejected: "#f43f5e",
-  withdrawn: "#71717a",
-  ghosted: "#fb923c",
-};
-
-export const TAG_LABELS: Record<ApplicationTag, string> = {
-  need_referral: "Need Referral",
-  referral_requested: "Referral Requested",
-  referral_given: "Referral Given",
-  recruiter_reachout: "Recruiter Reachout",
-  online_assessment: "Online Assessment",
-  take_home: "Take-home",
-  screening_call: "Screening Call",
-  tech_screen: "Tech Screen",
-  system_design: "System Design",
-  panel_round: "Panel Round",
-  offer_negotiation: "Offer Negotiation",
-  needs_follow_up: "Needs Follow-up",
-};
+export const STATUS_CHART_COLORS: Record<ApplicationStatus, string> =
+  Object.fromEntries(
+    (Object.keys(STATUS_HUE) as ApplicationStatus[]).map((status) => {
+      const { color, strength } = STATUS_HUE[status];
+      return [status, mix(color, Math.min(strength + 28, 100))];
+    }),
+  ) as Record<ApplicationStatus, string>;
 
 /**
- * Deliberately quieter than STATUS_STYLES — a card shows one status badge and
- * can show several tags, so tags read as secondary and don't compete with it.
+ * ─────────────────────────────────────────────────────────────────────────
+ *  THE TAGS — the only place a tag's label and colour are defined.
+ * ─────────────────────────────────────────────────────────────────────────
+ *
+ * One entry per tag, in the order they appear in pickers and on cards. To
+ * recolour a tag, edit its line; to add one, add a line (plus the enum value
+ * and migration — see `applicationTag` in the schema); to reorder them, move
+ * the line. `TAG_LABELS` and `TAG_ORDER` are derived from this, so nothing
+ * else needs a second edit.
+ *
+ * `color` and `strength` are the same two devices the statuses use: which of
+ * the five palette colours the chip takes, and how far between the weakest and
+ * strongest chip its fill sits. See `chipFill` above for how strength becomes
+ * a colour, and why it is relative rather than an absolute amount of hue.
+ *
+ * Tags are deliberately quieter than the status badge — a card shows one
+ * status but can show several tags, so tags must read as secondary.
  */
-export const TAG_STYLES: Record<ApplicationTag, string> = {
-  // One step lighter than referral_requested: same family, but reads as the
-  // not-yet-actioned one of the three.
-  need_referral: "bg-teal-50 text-teal-600 dark:bg-teal-950 dark:text-teal-400",
-  referral_requested:
-    "bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-300",
-  referral_given:
-    "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
-  recruiter_reachout: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
-  online_assessment:
-    "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300",
-  take_home: "bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300",
-  screening_call: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300",
-  tech_screen: "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-  system_design: "bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-950 dark:text-fuchsia-300",
-  panel_round: "bg-violet-50 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
-  offer_negotiation:
-    "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
-  needs_follow_up: "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-};
+export const TAGS = {
+  // Chrome: quietest family. Three steps across the full range, since chrome
+  // is already low-chroma and small deltas vanish.
+  need_referral: {
+    label: "Need Referral",
+    color: "--color-attn",
+    strength: 100,
+  },
+  referral_requested: {
+    label: "Referral Requested",
+    color: "--color-brand",
+    strength: 50,
+  },
+  referral_given: {
+    label: "Referral Given",
+    color: "--color-brand",
+    strength: 50,
+  },
+
+  // Brand: three visible tiers — early contact, live evaluation, final rounds.
+  recruiter_reachout: {
+    label: "Recruiter Reachout",
+    color: "--color-brand",
+    strength: 14,
+  },
+  online_assessment: {
+    label: "Online Assessment",
+    color: "--color-brand",
+    strength: 50,
+  },
+  take_home: { label: "Take-home", color: "--color-brand", strength: 14 },
+  screening_call: {
+    label: "Screening Call",
+    color: "--color-brand",
+    strength: 38,
+  },
+  tech_screen: { label: "Tech Screen", color: "--color-brand", strength: 38 },
+  system_design: {
+    label: "System Design",
+    color: "--color-brand",
+    strength: 68,
+  },
+  panel_round: { label: "Panel Round", color: "--color-brand", strength: 68 },
+
+  // Attn: both are calls to action, so both sit high.
+  offer_negotiation: {
+    label: "Offer Negotiation",
+    color: "--color-attn",
+    strength: 100,
+  },
+  needs_follow_up: {
+    label: "Needs Follow-up",
+    color: "--color-warn",
+    strength: 75,
+  },
+} as const satisfies Record<
+  ApplicationTag,
+  { label: string; color: string; strength: number }
+>;
+
+/**
+ * Every tag in display order, derived from `TAGS` so the order is the order
+ * the entries are written in. Object key order is insertion order for string
+ * keys, which is what makes this safe.
+ */
+export const TAG_ORDER = Object.keys(TAGS) as ApplicationTag[];
+
+export const TAG_LABELS = Object.fromEntries(
+  Object.entries(TAGS).map(([tag, { label }]) => [tag, label]),
+) as Record<ApplicationTag, string>;
+
+export function tagChipStyle(tag: ApplicationTag): CSSProperties {
+  const { color, strength } = TAGS[tag];
+  return { backgroundColor: chipFill(color, strength), color: chipText(color) };
+}
 
 /**
  * Worded as the posting's requirement, not as a category name — "No
@@ -178,19 +245,25 @@ export const SPONSORSHIP_LABELS: Record<Sponsorship, string> = {
 };
 
 /**
- * Green for the one that opens a door, rose for the ones that close it. The
- * three restrictive values share a family because the practical consequence is
- * the same — you need status you may not have.
+ * Lavender for the one that opens a door, dusty rose for the ones that close
+ * it. The three restrictive values share a family because the practical
+ * consequence is the same — you need status you may not have.
  */
-export const SPONSORSHIP_STYLES: Record<Sponsorship, string> = {
-  will_sponsor:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-  no_sponsorship: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
-  citizen: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
-  green_card: "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300",
-  clearance: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
+const SPONSORSHIP_HUE: Record<
+  Sponsorship,
+  { color: string; strength: number }
+> = {
+  will_sponsor: { color: "--color-brand", strength: 35 },
+  no_sponsorship: { color: "--color-warn", strength: 45 },
+  citizen: { color: "--color-warn", strength: 45 },
+  green_card: { color: "--color-attn", strength: 55 },
+  clearance: { color: "--color-warn", strength: 45 },
 };
 
+export function sponsorshipChipStyle(value: Sponsorship): CSSProperties {
+  const { color, strength } = SPONSORSHIP_HUE[value];
+  return { backgroundColor: chipFill(color, strength), color: chipText(color) };
+}
 export const INTERVIEW_FORMAT_LABELS: Record<string, string> = {
   phone: "Phone",
   video: "Video",

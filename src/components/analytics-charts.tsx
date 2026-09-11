@@ -48,12 +48,12 @@ function useTooltipStyle() {
   return {
     fontSize: 12,
     borderRadius: 8,
-    border: `1px solid ${isDark ? "rgb(63 63 70)" : "rgb(228 228 231)"}`,
-    background: isDark ? "rgb(24 24 27)" : "rgb(255 255 255)",
-    color: isDark ? "rgb(244 244 245)" : "rgb(24 24 27)",
+    border: `1px solid var(--chrome)`,
+    background: "var(--surface)",
+    color: "var(--ink)",
     boxShadow: isDark
       ? "0 8px 24px rgb(0 0 0 / 0.5)"
-      : "0 8px 24px rgb(24 24 27 / 0.12)",
+      : "0 8px 24px rgb(76 58 46 / 0.14)",
   };
 }
 
@@ -98,7 +98,7 @@ export function StageDurationChart({
 
   if (rows.length === 0) {
     return (
-      <p className="py-16 text-center text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="py-16 text-center text-sm text-muted dark:text-muted">
         Not enough history yet.
       </p>
     );
@@ -130,7 +130,7 @@ export function ActivityChart({
 
   if (data.length === 0) {
     return (
-      <p className="py-16 text-center text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="py-16 text-center text-sm text-muted dark:text-muted">
         No applications submitted in the last six months.
       </p>
     );
@@ -141,8 +141,8 @@ export function ActivityChart({
       <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -18 }}>
         <defs>
           <linearGradient id="activityFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.35} />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.02} />
+            <stop offset="0%" stopColor="var(--color-brand)" stopOpacity={0.35} />
+            <stop offset="100%" stopColor="var(--color-brand)" stopOpacity={0.02} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.12} />
@@ -153,10 +153,10 @@ export function ActivityChart({
           type="monotone"
           dataKey="applied"
           name="Applications"
-          stroke="#8b5cf6"
+          stroke="var(--color-brand)"
           strokeWidth={2}
           fill="url(#activityFill)"
-          dot={{ r: 3, fill: "#8b5cf6", strokeWidth: 0 }}
+          dot={{ r: 3, fill: "var(--color-brand)", strokeWidth: 0 }}
           activeDot={{ r: 5 }}
         />
       </AreaChart>

@@ -52,10 +52,10 @@ export default async function AdminPage(props: PageProps<"/admin">) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-xl font-semibold tracking-tight text-ink dark:text-muted">
           Admin
         </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-muted dark:text-muted">
           Raw table data, exactly as stored — unfiltered and unaggregated,
           including archived rows that the other views hide.
         </p>
@@ -71,16 +71,16 @@ export default async function AdminPage(props: PageProps<"/admin">) {
               aria-current={active ? "page" : undefined}
               className={`rounded-md px-3 py-1.5 font-mono text-xs transition-colors ${
                 active
-                  ? "bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-sm shadow-violet-600/25"
-                  : "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  ? "bg-gradient-to-br from-brand to-brand text-white shadow-sm shadow-brand/25"
+                  : "border border-chrome text-ink hover:bg-ground dark:border-chrome dark:text-muted dark:hover:bg-chrome"
               }`}
             >
               {slug}
               <span
                 className={`ml-1.5 tabular-nums ${
                   active
-                    ? "text-zinc-400 dark:text-zinc-500"
-                    : "text-zinc-400 dark:text-zinc-500"
+                    ? "text-muted dark:text-muted"
+                    : "text-muted dark:text-muted"
                 }`}
               >
                 {counts[slug]}
@@ -91,10 +91,10 @@ export default async function AdminPage(props: PageProps<"/admin">) {
       </nav>
 
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-mono text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+        <h2 className="font-mono text-sm font-semibold text-ink dark:text-muted">
           {data.tableName}
         </h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted dark:text-muted">
           {truncated ? (
             <>
               showing {data.rows.length} of {data.total} rows
@@ -103,7 +103,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
                   {" · "}
                   <Link
                     href={`/admin?table=${table}&limit=${MAX_LIMIT}`}
-                    className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-200"
+                    className="underline underline-offset-2 hover:text-ink dark:hover:text-muted"
                   >
                     show up to {MAX_LIMIT}
                   </Link>
@@ -119,16 +119,16 @@ export default async function AdminPage(props: PageProps<"/admin">) {
       </div>
 
       {data.rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-zinc-300 p-12 text-center dark:border-zinc-700">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="rounded-lg border border-dashed border-chrome p-12 text-center dark:border-chrome">
+          <p className="text-sm text-muted dark:text-muted">
             No rows in{" "}
             <span className="font-mono">{data.tableName}</span> yet.
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="overflow-x-auto rounded-xl border border-chrome bg-surface shadow-sm dark:border-chrome dark:bg-chrome">
           <table className="w-full min-w-[56rem] text-sm">
-            <thead className="border-b border-zinc-200 text-left text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+            <thead className="border-b border-chrome text-left text-xs uppercase tracking-wide text-muted dark:border-chrome dark:text-muted">
               <tr>
                 {data.columns.map((column) => (
                   <th key={column} className="px-4 py-2.5 font-medium">
@@ -137,11 +137,11 @@ export default async function AdminPage(props: PageProps<"/admin">) {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-chrome dark:divide-chrome">
               {data.rows.map((row, index) => (
                 <tr
                   key={typeof row.id === "string" ? row.id : index}
-                  className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                  className="transition-colors hover:bg-ground dark:hover:bg-chrome/50"
                 >
                   {data.columns.map((column) => {
                     const text = formatCell(row[column]);
@@ -149,7 +149,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
                       <td
                         key={column}
                         title={text === "—" ? undefined : text}
-                        className="px-4 py-3 text-zinc-600 dark:text-zinc-400"
+                        className="px-4 py-3 text-muted dark:text-muted"
                       >
                         <span className="block max-w-[18rem] truncate font-mono text-xs">
                           {text}

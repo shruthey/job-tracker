@@ -56,7 +56,7 @@ export function ContactsHint({
         aria-label={label}
         aria-expanded={open}
         aria-describedby={open ? panelId : undefined}
-        className="rounded-full p-0.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-zinc-500 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+        className="rounded-full p-0.5 text-muted transition-colors hover:bg-ground hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-chrome dark:text-muted dark:hover:bg-chrome dark:hover:text-muted"
       >
         <InfoIcon className="h-3.5 w-3.5" />
       </button>
@@ -67,15 +67,15 @@ export function ContactsHint({
           role="tooltip"
           // Opens downward: upward it would cover the column header on the
           // board, and the first row's panel would clip off the top of a table.
-          className="absolute top-full right-0 z-20 mt-1 w-max max-w-52 rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-left shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+          className="absolute top-full right-0 z-20 mt-1 w-max max-w-52 rounded-md border border-chrome bg-surface px-2 py-1.5 text-left shadow-lg dark:border-chrome dark:bg-chrome"
         >
-          <span className="block text-[10px] font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+          <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted dark:text-muted">
             {contacts.length === 1 ? "Contact" : "Contacts"}
           </span>
           {contacts.map((name) => (
             <span
               key={name}
-              className="block truncate text-xs text-zinc-800 dark:text-zinc-100"
+              className="block truncate text-xs text-ink dark:text-muted"
             >
               {name}
             </span>
