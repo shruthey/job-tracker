@@ -32,7 +32,8 @@ import {
 } from "@/lib/format";
 import { TagList } from "@/components/tag-chip";
 import { SponsorshipBadge } from "@/components/sponsorship-badge";
-import { ExternalLinkIcon } from "@/components/icons";
+import { ChevronRightIcon, ExternalLinkIcon } from "@/components/icons";
+import { ContactsHint } from "@/components/contacts-hint";
 import { moveApplication } from "@/lib/actions";
 
 const STORAGE_KEY = "board:visible-columns";
@@ -110,6 +111,96 @@ function writeStored(next: ApplicationStatus[]) {
     // Storage unavailable; the choice still applies for this session.
   }
   for (const listener of listeners) listener();
+}
+
+/**
+ * Collapsed groups, keyed `status/company` so the same employer can be folded
+ * in one column and open in another. Stored as a list rather than a set
+ * because it has to survive `JSON.stringify`.
+ *
+ * A second tiny store over localStorage, same shape as the column preference
+ * above: `useSyncExternalStore` compares by identity, so `collapsedCache` must
+ * hold a stable value until the preference actually changes.
+ */
+const COLLAPSED_KEY = "board:collapsed-groups";
+
+const collapsedListeners = new Set<() => void>();
+let collapsedCache: ReadonlySet<string> | null = null;
+
+const EMPTY_COLLAPSED: ReadonlySet<string> = new Set<string>();
+
+function groupKey(status: ApplicationStatus, companyName: string) {
+  return `${status}/${companyName}`;
+}
+
+function readCollapsed(): ReadonlySet<string> | null {
+  try {
+    const raw = window.localStorage.getItem(COLLAPSED_KEY);
+    if (!raw) return null;
+
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return null;
+
+    return new Set(parsed.filter((k): k is string => typeof k === "string"));
+  } catch {
+    // Private mode, disabled storage, or malformed JSON — nothing collapsed.
+    return null;
+  }
+}
+
+function subscribeToCollapsed(onChange: () => void) {
+  collapsedListeners.add(onChange);
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === COLLAPSED_KEY) {
+      collapsedCache = null;
+      onChange();
+    }
+  };
+  window.addEventListener("storage", onStorage);
+
+  return () => {
+    collapsedListeners.delete(onChange);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function getCollapsedSnapshot(): ReadonlySet<string> {
+  if (collapsedCache === null) collapsedCache = readCollapsed() ?? EMPTY_COLLAPSED;
+  return collapsedCache;
+}
+
+function getServerCollapsedSnapshot(): ReadonlySet<string> {
+  return EMPTY_COLLAPSED;
+}
+
+function writeCollapsed(next: ReadonlySet<string>) {
+  collapsedCache = next;
+  try {
+    window.localStorage.setItem(COLLAPSED_KEY, JSON.stringify([...next]));
+  } catch {
+    // Storage unavailable; the choice still applies for this session.
+  }
+  for (const listener of collapsedListeners) listener();
+}
+
+function toggleCollapsed(key: string) {
+  const next = new Set(getCollapsedSnapshot());
+  if (!next.delete(key)) next.add(key);
+  writeCollapsed(next);
+}
+
+/**
+ * Collapse or expand a batch of groups at once, for the board-level control.
+ * Keys outside the batch are left alone, so folding everything in the visible
+ * columns does not disturb a column that is currently hidden.
+ */
+function setCollapsedFor(keys: string[], isCollapsed: boolean) {
+  const next = new Set(getCollapsedSnapshot());
+  for (const key of keys) {
+    if (isCollapsed) next.add(key);
+    else next.delete(key);
+  }
+  writeCollapsed(next);
 }
 
 function ColumnPicker({
@@ -232,6 +323,39 @@ function ColumnPicker({
   );
 }
 
+/**
+ * One control rather than a pair of buttons: with the groups either all folded
+ * or not, a second button would always be the no-op one. The label says what
+ * the click will do.
+ */
+function CollapseAllToggle({
+  groupKeys,
+  collapsed,
+}: {
+  groupKeys: string[];
+  collapsed: ReadonlySet<string>;
+}) {
+  if (groupKeys.length === 0) return null;
+
+  // Anything still open means the useful action is to collapse.
+  const anyExpanded = groupKeys.some((key) => !collapsed.has(key));
+
+  return (
+    <button
+      type="button"
+      onClick={() => setCollapsedFor(groupKeys, anyExpanded)}
+      className="inline-flex items-center gap-1.5 rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+    >
+      <ChevronRightIcon
+        className={`h-3 w-3 text-zinc-500 transition-transform dark:text-zinc-400 ${
+          anyExpanded ? "rotate-90" : ""
+        }`}
+      />
+      {anyExpanded ? "Collapse all" : "Expand all"}
+    </button>
+  );
+}
+
 export type Card = {
   id: string;
   title: string;
@@ -248,6 +372,7 @@ export type Card = {
   updatedAt: Date;
   tags: ApplicationTag[];
   nextInterviewAt: Date | null;
+  contacts: string[];
 };
 
 function CardTile({
@@ -390,6 +515,11 @@ function Column({
   cards: Card[];
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
+  const collapsed = useSyncExternalStore(
+    subscribeToCollapsed,
+    getCollapsedSnapshot,
+    getServerCollapsedSnapshot,
+  );
 
   return (
     <section
@@ -411,30 +541,76 @@ function Column({
         </span>
       </header>
       <div className="flex flex-col gap-4 p-1">
-        {groupByCompany(cards).map((group) => (
-          <div key={group.companyName} className="flex flex-col gap-1">
-            {/*
-              A filled bar rather than a bare label: the group boundary has to
-              survive a column of same-sized cards, so the header carries its
-              own background and the cards below hang off a matching rail.
-            */}
-            <div className="flex items-baseline justify-between gap-2 rounded-md bg-zinc-200/80 px-2 py-1 dark:bg-zinc-800">
-              <span className="truncate text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-200">
-                {group.companyName}
-              </span>
-              {group.cards.length > 1 ? (
-                <span className="shrink-0 text-[11px] font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
-                  {group.cards.length}
-                </span>
-              ) : null}
+        {groupByCompany(cards).map((group) => {
+          const key = groupKey(status, group.companyName);
+          const isCollapsed = collapsed.has(key);
+          const panelId = `group-${key.replace(/[^a-zA-Z0-9]+/g, "-")}`;
+
+          return (
+            <div key={group.companyName} className="flex flex-col gap-1">
+              {/*
+                A filled bar rather than a bare label: the group boundary has
+                to survive a column of same-sized cards, so the header carries
+                its own background and the cards below hang off a matching
+                rail. The whole bar is the toggle — a bigger target than the
+                chevron alone.
+              */}
+              <div className="flex items-center gap-1 rounded-md border-l-[3px] border-zinc-400 bg-zinc-200/90 pr-2 dark:border-zinc-500 dark:bg-zinc-800">
+                {/*
+                  The toggle is its own element rather than the whole bar,
+                  because the contacts hint beside it is a button too and a
+                  button cannot nest inside another.
+                */}
+                <button
+                  type="button"
+                  onClick={() => toggleCollapsed(key)}
+                  aria-expanded={!isCollapsed}
+                  aria-controls={panelId}
+                  className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-2 py-1 text-left transition-colors hover:bg-zinc-300/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-zinc-500 dark:hover:bg-zinc-700"
+                >
+                  <ChevronRightIcon
+                    className={`h-3 w-3 shrink-0 text-zinc-500 transition-transform dark:text-zinc-400 ${
+                      isCollapsed ? "" : "rotate-90"
+                    }`}
+                  />
+                  <span className="truncate text-[11px] font-bold uppercase tracking-wider text-zinc-800 dark:text-zinc-100">
+                    {group.companyName}
+                  </span>
+                  {/* Collapsed, the count is the only clue to what is inside. */}
+                  {group.cards.length > 1 || isCollapsed ? (
+                    <span className="ml-auto shrink-0 text-[11px] font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
+                      {group.cards.length}
+                    </span>
+                  ) : null}
+                </button>
+                {/*
+                  Contacts belong to the company, so they hang off the company
+                  header rather than any one role. Every card in the group
+                  carries the same list; the first is as good as any.
+                */}
+                <ContactsHint
+                  contacts={group.cards[0].contacts}
+                  companyName={group.companyName}
+                />
+              </div>
+              {/*
+                The rail continues the header's left border down the group, so
+                the header and its cards share one left edge instead of the
+                header overhanging them.
+              */}
+              {isCollapsed ? null : (
+                <div
+                  id={panelId}
+                  className="flex flex-col gap-1 border-l-[3px] border-zinc-300 pl-1.5 dark:border-zinc-700"
+                >
+                  {group.cards.map((card) => (
+                    <DraggableCard key={card.id} card={card} />
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="flex flex-col gap-1 border-l-2 border-zinc-200/80 pl-1.5 dark:border-zinc-800">
-              {group.cards.map((card) => (
-                <DraggableCard key={card.id} card={card} />
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
         {cards.length === 0 ? (
           <p className="px-1 py-6 text-center text-xs text-zinc-400 dark:text-zinc-600">
             Nothing here
@@ -523,6 +699,22 @@ export function Board({ cards }: { cards: Card[] }) {
     (c) => !visible.includes(c.status),
   ).length;
 
+  // Only the groups on screen: the control should not silently fold away
+  // groups in a column the user cannot see.
+  const collapsed = useSyncExternalStore(
+    subscribeToCollapsed,
+    getCollapsedSnapshot,
+    getServerCollapsedSnapshot,
+  );
+
+  const groupKeys = [
+    ...new Set(
+      optimisticCards
+        .filter((c) => visible.includes(c.status))
+        .map((c) => groupKey(c.status, c.companyName)),
+    ),
+  ];
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
@@ -531,11 +723,14 @@ export function Board({ cards }: { cards: Card[] }) {
             ? `${hiddenCards} ${hiddenCards === 1 ? "card" : "cards"} in hidden columns`
             : " "}
         </p>
-        <ColumnPicker
-          visible={visible}
-          onChange={updateVisible}
-          counts={counts}
-        />
+        <div className="flex items-center gap-2">
+          <CollapseAllToggle groupKeys={groupKeys} collapsed={collapsed} />
+          <ColumnPicker
+            visible={visible}
+            onChange={updateVisible}
+            counts={counts}
+          />
+        </div>
       </div>
 
       {error ? (

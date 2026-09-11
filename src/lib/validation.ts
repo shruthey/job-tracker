@@ -101,6 +101,22 @@ export const updateCompanySchema = z.object({
   website: optionalUrl,
 });
 
+/**
+ * A contact is just a name here — the `contacts` table has role/email/linkedin
+ * columns, but this flow deliberately fills none of them. A name is what you
+ * actually remember about a referral; the rest is a CRM nobody maintains.
+ */
+export const MAX_CONTACTS_PER_COMPANY = 2;
+
+export const addContactSchema = z.object({
+  companyId: z.string().uuid(),
+  name: z.string().trim().min(1, "A name is required").max(120),
+});
+
+export const removeContactSchema = z.object({
+  id: z.string().uuid(),
+});
+
 /** Shape returned to a form by a failed server action. */
 export type ActionState = {
   ok: boolean;

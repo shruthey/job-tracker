@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { archiveApplications, deleteApplications } from "@/lib/actions";
 import { StatusBadge } from "@/components/status-badge";
+import { ContactsHint } from "@/components/contacts-hint";
 import {
   formatDate,
   formatDateTime,
@@ -263,7 +264,13 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                     <TagList tags={row.tags} className="mt-1.5" />
                   </td>
                   <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                    {row.companyName}
+                    <span className="inline-flex items-center gap-1">
+                      {row.companyName}
+                      <ContactsHint
+                        contacts={row.contacts}
+                        companyName={row.companyName}
+                      />
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={row.status} />

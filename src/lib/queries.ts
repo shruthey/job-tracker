@@ -7,6 +7,7 @@ import {
   applicationTags,
   applications,
   companies,
+  contacts,
   documents,
   interviews,
   reminders,
@@ -82,6 +83,22 @@ const tagsColumn = sql<ApplicationTag[]>`coalesce(
   '{}'
 )`;
 
+/**
+ * The company's contact names, for the hover panel on the board and the
+ * applications list. Correlated on the application's company, and written with
+ * qualified column names for the same reason as `tagsColumn` above.
+ *
+ * Read-only everywhere it is used: contacts are added on the Companies page.
+ */
+const contactsColumn = sql<string[]>`coalesce(
+  (
+    select array_agg("contacts"."name" order by "contacts"."created_at")
+    from ${contacts}
+    where "contacts"."company_id" = "applications"."company_id"
+  ),
+  '{}'
+)`;
+
 /** The soonest interview still in the future, for the "Interview Scheduled" chip. */
 const nextInterviewColumn = sql<Date | null>`(
   select min("interviews"."scheduled_at")
@@ -112,6 +129,7 @@ export async function listApplications(filters: ApplicationFilters = {}) {
       companyName: companies.name,
       tags: tagsColumn,
       nextInterviewAt: nextInterviewColumn,
+      contacts: contactsColumn,
     })
     .from(applications)
     .innerJoin(companies, eq(applications.companyId, companies.id))
@@ -140,6 +158,7 @@ export async function listBoard() {
       updatedAt: applications.updatedAt,
       tags: tagsColumn,
       nextInterviewAt: nextInterviewColumn,
+      contacts: contactsColumn,
     })
     .from(applications)
     .innerJoin(companies, eq(applications.companyId, companies.id))
@@ -239,6 +258,7 @@ export async function listCompanyOverview() {
     active_count: number;
     furthest_status: ApplicationStatus | null;
     last_activity: Date | null;
+    contacts: { id: string; name: string }[] | null;
   }>(sql`
     select
       c.id,
@@ -260,7 +280,18 @@ export async function listCompanyOverview() {
         order by case e.to_status ${sql.raw(funnelRank)} else -1 end desc
         limit 1
       ) as furthest_status,
-      max(a.updated_at) as last_activity
+      max(a.updated_at) as last_activity,
+      -- Aggregated in a subquery rather than a join, so the contact rows
+      -- cannot multiply the application counts above.
+      (
+        select coalesce(
+          json_agg(json_build_object('id', ct.id, 'name', ct.name)
+                   order by ct.created_at),
+          '[]'::json
+        )
+        from contacts ct
+        where ct.company_id = c.id
+      ) as contacts
     from companies c
     left join applications a
       on a.company_id = c.id and a.archived_at is null
@@ -279,6 +310,7 @@ export async function listCompanyOverview() {
     activeCount: Number(r.active_count),
     furthestStatus: r.furthest_status,
     lastActivity: r.last_activity,
+    contacts: r.contacts ?? [],
   }));
 }
 

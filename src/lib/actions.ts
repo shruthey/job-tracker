@@ -10,6 +10,7 @@ import {
   applicationTags,
   applications,
   companies,
+  contacts,
   interviews,
   reminders,
   statusEvents,
@@ -20,12 +21,15 @@ import {
   upsertCompany,
 } from "@/lib/applications";
 import {
+  addContactSchema,
   addTargetCompanySchema,
   applicationInputSchema,
   interviewInputSchema,
   moveApplicationSchema,
+  removeContactSchema,
   toggleTagSchema,
   updateCompanySchema,
+  MAX_CONTACTS_PER_COMPANY,
   toActionState,
   type ActionState,
 } from "@/lib/validation";
@@ -387,6 +391,75 @@ export async function addTargetCompany(
 
   revalidatePath("/companies");
   return { ok: true, message: `Added ${input.name}.` };
+}
+
+/**
+ * Adds a name to a company's contact list. Name only — see
+ * `addContactSchema`.
+ *
+ * The cap is enforced here rather than only by hiding the button, because a
+ * server action is reachable by direct POST. Counting and inserting run in one
+ * transaction so two racing submits cannot both see one contact and each add a
+ * second.
+ */
+export async function addContact(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = addContactSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return toActionState(parsed.error);
+
+  const { companyId, name } = parsed.data;
+
+  try {
+    const result = await db.transaction(async (tx) => {
+      const existing = await tx
+        .select({ id: contacts.id, name: contacts.name })
+        .from(contacts)
+        .where(eq(contacts.companyId, companyId));
+
+      if (existing.length >= MAX_CONTACTS_PER_COMPANY) {
+        return {
+          ok: false,
+          message: `Only ${MAX_CONTACTS_PER_COMPANY} contacts per company.`,
+        } satisfies ActionState;
+      }
+
+      // Case-insensitive: "Priya" and "priya" are the same person.
+      const duplicate = existing.some(
+        (c) => c.name.toLowerCase() === name.toLowerCase(),
+      );
+      if (duplicate) {
+        return { ok: false, message: `${name} is already there.` } satisfies ActionState;
+      }
+
+      await tx.insert(contacts).values({ companyId, name });
+      return { ok: true } satisfies ActionState;
+    });
+
+    if (!result.ok) return result;
+  } catch (error) {
+    console.error("addContact failed", error);
+    return { ok: false, message: "Could not add the contact." };
+  }
+
+  revalidatePath("/companies");
+  return { ok: true };
+}
+
+export async function removeContact(id: string): Promise<ActionState> {
+  const parsed = removeContactSchema.safeParse({ id });
+  if (!parsed.success) return toActionState(parsed.error);
+
+  try {
+    await db.delete(contacts).where(eq(contacts.id, parsed.data.id));
+  } catch (error) {
+    console.error("removeContact failed", error);
+    return { ok: false, message: "Could not remove the contact." };
+  }
+
+  revalidatePath("/companies");
+  return { ok: true };
 }
 
 export async function updateCompany(input: {

@@ -1,17 +1,21 @@
 "use client";
 
-import { useActionState, useOptimistic, useState, useTransition } from "react";
+import { useActionState, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 
 import {
+  addContact,
   addTargetCompany,
+  removeContact,
   removeFromWatchlist,
   setCompanyPipeline,
 } from "@/lib/actions";
+import { MAX_CONTACTS_PER_COMPANY } from "@/lib/validation";
 import { StatusBadge } from "@/components/status-badge";
 import { ExternalLinkIcon } from "@/components/icons";
 import { relativeDays } from "@/lib/format";
 import type { CompanyOverview } from "@/lib/queries";
+import type { ActionState } from "@/lib/validation";
 import type { CompanyPipeline } from "@/db/schema";
 
 const PIPELINE_LABELS: Record<CompanyPipeline, string> = {
@@ -98,6 +102,139 @@ function QuickAdd() {
   );
 }
 
+/**
+ * The contact names for one company: at most two, name only. Adding opens a
+ * single inline input rather than a dialog — one field does not deserve a
+ * modal — and the add affordance disappears at the cap, so the limit shows
+ * itself instead of arriving as an error after you type.
+ */
+function ContactRow({ company }: { company: CompanyOverview }) {
+  const [adding, setAdding] = useState(false);
+  const [, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [state, formAction, pending] = useActionState(
+    async (prev: ActionState, formData: FormData) => {
+      const result = await addContact(prev, formData);
+      // Keep the input open on failure so the rejected name is still there to
+      // correct; close it once the name is in.
+      if (result.ok) setAdding(false);
+      return result;
+    },
+    { ok: true } as ActionState,
+  );
+
+  // Optimism is worth it here: the name is the whole payload, so there is
+  // nothing the server can change about it on the way back.
+  const [optimisticContacts, addOptimistic] = useOptimistic(
+    company.contacts,
+    (current, name: string) => [...current, { id: `pending-${name}`, name }],
+  );
+
+  useEffect(() => {
+    if (adding) inputRef.current?.focus();
+  }, [adding]);
+
+  const atCap = optimisticContacts.length >= MAX_CONTACTS_PER_COMPANY;
+
+  function remove(id: string, name: string) {
+    startTransition(async () => {
+      setError(null);
+      const result = await removeContact(id);
+      if (!result.ok) setError(result.message ?? `Could not remove ${name}.`);
+    });
+  }
+
+  return (
+    <div className="flex min-w-0 shrink items-center justify-end gap-1">
+      {optimisticContacts.map((contact) => (
+        <span
+          key={contact.id}
+          className="inline-flex min-w-0 items-center gap-0.5 rounded-full bg-zinc-100 py-0.5 pl-2 pr-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+        >
+          <span className="truncate">{contact.name}</span>
+          <button
+            type="button"
+            onClick={() => remove(contact.id, contact.name)}
+            title={`Remove ${contact.name}`}
+            aria-label={`Remove ${contact.name} from ${company.name}`}
+            className="shrink-0 rounded-full px-1 leading-none text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400"
+          >
+            ×
+          </button>
+        </span>
+      ))}
+
+      {adding && !atCap ? (
+        <form
+          action={(formData) => {
+            const name = String(formData.get("name") ?? "").trim();
+            if (name) addOptimistic(name);
+            formAction(formData);
+          }}
+          className="inline-flex items-center gap-1"
+        >
+          <input type="hidden" name="companyId" value={company.id} />
+          <input
+            ref={inputRef}
+            name="name"
+            required
+            maxLength={120}
+            placeholder="Name"
+            aria-label={`Contact name at ${company.name}`}
+            onBlur={(e) => {
+              // Blur into the submit button is not a cancel.
+              if (!e.currentTarget.form?.contains(e.relatedTarget as Node)) {
+                setAdding(false);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setAdding(false);
+            }}
+            className="w-28 rounded-md border border-zinc-300 bg-white px-2 py-0.5 text-xs text-zinc-900 placeholder:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+          />
+          <button
+            type="submit"
+            disabled={pending}
+            className="rounded-md bg-zinc-900 px-2 py-0.5 text-xs font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+          >
+            Add
+          </button>
+        </form>
+      ) : null}
+
+      {!adding && !atCap ? (
+        <button
+          type="button"
+          onClick={() => setAdding(true)}
+          title={`Add a contact at ${company.name}`}
+          aria-label={`Add a contact at ${company.name}`}
+          className="shrink-0 rounded-full border border-dashed border-zinc-300 px-2 py-0.5 text-xs text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+        >
+          {optimisticContacts.length === 0 ? "+ contact" : "+"}
+        </button>
+      ) : null}
+
+      {state.message && !state.ok ? (
+        <span className="text-xs text-rose-600 dark:text-rose-400">
+          {state.message}
+        </span>
+      ) : null}
+      {state.fieldErrors?.name ? (
+        <span className="text-xs text-rose-600 dark:text-rose-400">
+          {state.fieldErrors.name[0]}
+        </span>
+      ) : null}
+      {error ? (
+        <span role="status" className="text-xs text-rose-600 dark:text-rose-400">
+          {error}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function WatchlistRow({ company }: { company: CompanyOverview }) {
   const [, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -131,37 +268,38 @@ function WatchlistRow({ company }: { company: CompanyOverview }) {
   }
 
   return (
-    <li className="flex flex-col gap-1 rounded-md border border-zinc-200 px-3 py-2 dark:border-zinc-800">
-      <div className="flex items-center justify-between gap-2">
-      <div className="flex min-w-0 flex-col gap-0.5">
-        <CompanyLink company={company} />
-        {company.notes ? (
-          <span className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-            {company.notes}
-          </span>
-        ) : null}
-      </div>
-      <div className="flex shrink-0 items-center gap-1">
-        <button
-          type="button"
-          onClick={advance}
-          title="Click to change status"
-          className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
-            pipeline ? PIPELINE_STYLES[pipeline] : ""
-          }`}
-        >
-          {pipeline ? PIPELINE_LABELS[pipeline] : "—"}
-        </button>
-        <button
-          type="button"
-          onClick={remove}
-          title={`Delete ${company.name}`}
-          aria-label={`Delete ${company.name}`}
-          className="rounded px-1.5 py-0.5 text-xs text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400"
-        >
-          ×
-        </button>
-      </div>
+    <li className="flex flex-col gap-0.5 rounded-md border border-zinc-200 px-2.5 py-1.5 dark:border-zinc-800">
+      <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 flex-col">
+          <CompanyLink company={company} />
+          {company.notes ? (
+            <span className="truncate text-xs leading-tight text-zinc-500 dark:text-zinc-400">
+              {company.notes}
+            </span>
+          ) : null}
+        </div>
+        <ContactRow company={company} />
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={advance}
+            title="Click to change status"
+            className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
+              pipeline ? PIPELINE_STYLES[pipeline] : ""
+            }`}
+          >
+            {pipeline ? PIPELINE_LABELS[pipeline] : "—"}
+          </button>
+          <button
+            type="button"
+            onClick={remove}
+            title={`Delete ${company.name}`}
+            aria-label={`Delete ${company.name}`}
+            className="rounded px-1.5 py-0.5 text-xs text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400"
+          >
+            ×
+          </button>
+        </div>
       </div>
       {error ? (
         <p role="status" className="text-xs text-rose-600 dark:text-rose-400">
@@ -174,15 +312,15 @@ function WatchlistRow({ company }: { company: CompanyOverview }) {
 
 function AppliedRow({ company }: { company: CompanyOverview }) {
   return (
-    <li className="flex items-center justify-between gap-2 rounded-md border border-zinc-200 px-3 py-2 dark:border-zinc-800">
-      <div className="flex min-w-0 flex-col gap-0.5">
+    <li className="flex items-center gap-2 rounded-md border border-zinc-200 px-2.5 py-1.5 dark:border-zinc-800">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Link
           href={`/applications?company=${company.id}`}
           className="min-w-0 hover:underline"
         >
           <CompanyLink company={company} />
         </Link>
-        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs leading-tight text-zinc-500 dark:text-zinc-400">
           {company.applicationCount === 1
             ? "1 role"
             : `${company.applicationCount} roles`}
@@ -192,6 +330,7 @@ function AppliedRow({ company }: { company: CompanyOverview }) {
             : ""}
         </span>
       </div>
+      <ContactRow company={company} />
       {company.furthestStatus ? (
         <span className="shrink-0" title="Furthest stage reached">
           <StatusBadge status={company.furthestStatus} />
@@ -210,8 +349,8 @@ export function CompanyColumns({ companies }: { companies: CompanyOverview[] }) 
   );
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <section className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="grid gap-4 lg:grid-cols-2">
+      <section className="flex flex-col gap-2.5 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
             To apply
@@ -228,7 +367,7 @@ export function CompanyColumns({ companies }: { companies: CompanyOverview[] }) 
             Nothing on the list yet. Add a company you are thinking about.
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-1.5">
             {watchlist.map((c) => (
               <WatchlistRow key={c.id} company={c} />
             ))}
@@ -236,7 +375,7 @@ export function CompanyColumns({ companies }: { companies: CompanyOverview[] }) 
         )}
       </section>
 
-      <section className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="flex flex-col gap-2.5 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
             Applied
@@ -251,7 +390,7 @@ export function CompanyColumns({ companies }: { companies: CompanyOverview[] }) 
             No applications yet.
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-1.5">
             {applied.map((c) => (
               <AppliedRow key={c.id} company={c} />
             ))}
