@@ -1,0 +1,1 @@
+ALTER TYPE "public"."application_tag" ADD VALUE 'update_resume';

@@ -42,7 +42,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-8">{children}</main>
+      {/*
+        The reading-width cap lives on `PageWidth` (see `@/components/page`),
+        which each page wraps its own content in, rather than here. The board
+        is the one page that wants the whole viewport — its columns scroll
+        horizontally, so a capped pixel is a column you have to scroll to
+        reach — and it is the one page that omits the wrapper.
+      */}
+      <main className="w-full flex-1 px-6 py-8">{children}</main>
     </div>
   );
 }

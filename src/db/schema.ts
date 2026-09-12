@@ -18,6 +18,8 @@ import { relations, sql } from "drizzle-orm";
  */
 export const applicationStatus = pgEnum("application_status", [
   "saved",
+  "referral_requested",
+  "referral_given",
   "applied",
   "screen",
   "interview",
@@ -30,7 +32,14 @@ export const applicationStatus = pgEnum("application_status", [
 
 export type ApplicationStatus = (typeof applicationStatus.enumValues)[number];
 
-/** Statuses a candidate advances *through*, in order. Terminal states excluded. */
+/**
+ * Statuses a candidate advances *through*, in order. Terminal states excluded,
+ * and so are the two referral stages: the funnel chart reads this as a chain
+ * where each stage converts from the one before it, and a referral is a detour
+ * most applications skip. Counting them here would divide `applied` by a stage
+ * that is empty for anyone who never asked for a referral. `REFERRAL_STAGES`
+ * below holds them for the board, which has no such requirement.
+ */
 export const FUNNEL_ORDER = [
   "saved",
   "applied",
@@ -40,9 +49,32 @@ export const FUNNEL_ORDER = [
   "offer",
 ] as const satisfies readonly ApplicationStatus[];
 
+/**
+ * The optional referral path, sitting between `saved` and `applied`. An
+ * application enters it only when you actually chase a referral for the role;
+ * from either stage the next move is `applied`.
+ */
+export const REFERRAL_STAGES = [
+  "referral_requested",
+  "referral_given",
+] as const satisfies readonly ApplicationStatus[];
+
+/**
+ * Every advancing stage ranked by how far along it is, referral stages
+ * included. `FUNNEL_ORDER` is the chain of *conversions* and deliberately
+ * skips the referral detour; this is the ordering to use when the question is
+ * "how far did this get?", where a requested referral is real progress past
+ * `saved`.
+ */
+export const PROGRESS_ORDER = [
+  "saved",
+  ...REFERRAL_STAGES,
+  ...FUNNEL_ORDER.filter((s) => s !== "saved"),
+] as const satisfies readonly ApplicationStatus[];
+
 /** Every column shown on the board, left to right. */
 export const BOARD_ORDER = [
-  ...FUNNEL_ORDER,
+  ...PROGRESS_ORDER,
   "rejected",
   "ghosted",
   "withdrawn",
@@ -76,13 +108,6 @@ export const documentKind = pgEnum("document_kind", ["resume", "cover_letter"]);
 export const applicationTag = pgEnum("application_tag", [
   "online_assessment",
   "screening_call",
-  "take_home",
-  "tech_screen",
-  "referral_requested",
-  "referral_given",
-  "recruiter_reachout",
-  "panel_round",
-  "system_design",
   "offer_negotiation",
   "needs_follow_up",
   // Appended, not inserted: `ALTER TYPE ... ADD VALUE` can only append, and
@@ -90,6 +115,7 @@ export const applicationTag = pgEnum("application_tag", [
   // reading drift and proposing a destructive type rebuild. Display order is
   // `TAG_ORDER` below, which is independent of this.
   "need_referral",
+  "update_resume",
 ]);
 
 export type ApplicationTag = (typeof applicationTag.enumValues)[number];
@@ -99,10 +125,10 @@ export type ApplicationTag = (typeof applicationTag.enumValues)[number];
  * `@/lib/format`, which `TAG_ORDER` and `TAG_LABELS` are derived from. The
  * enum above is only the stored vocabulary.
  *
- * The three referral tags lead there and share a colour family because they
- * are a progression: `need_referral` is "this role wants one and I haven't
- * asked anyone yet", `referral_requested` is "I asked", `referral_given` is
- * "someone came through". Only the first is a to-do.
+ * `need_referral` is the one referral tag left: "this role wants one and I
+ * haven't asked anyone yet", a to-do. Once you have actually asked, that is a
+ * status rather than a tag — the `referral_requested` and `referral_given`
+ * board columns — so the tags by those names were removed.
  */
 
 /**
@@ -116,42 +142,19 @@ export type ApplicationTag = (typeof applicationTag.enumValues)[number];
  * move would lose information the user never chose to discard.
  */
 export const STATUS_TAGS = {
-  saved: [
-    "need_referral",
-    "referral_requested",
-    "referral_given",
-    "recruiter_reachout",
-    "needs_follow_up",
-  ],
-  applied: [
-    "need_referral",
-    "referral_requested",
-    "referral_given",
-    "recruiter_reachout",
-    "online_assessment",
-    "take_home",
-    "needs_follow_up",
-  ],
-  screen: [
-    "online_assessment",
-    "take_home",
-    "screening_call",
-    "tech_screen",
-    "needs_follow_up",
-  ],
-  interview: [
-    "take_home",
-    "tech_screen",
-    "system_design",
-    "panel_round",
-    "needs_follow_up",
-  ],
-  onsite: [
-    "tech_screen",
-    "system_design",
-    "panel_round",
-    "needs_follow_up",
-  ],
+  /*
+   * `update_resume` is offered on the stages before the application goes out,
+   * where tailoring the resume is still something you can act on, and not
+   * after: once it is submitted, "update resume" is no longer a to-do for this
+   * application.
+   */
+  saved: ["need_referral", "update_resume", "needs_follow_up"],
+  referral_requested: ["update_resume", "needs_follow_up"],
+  referral_given: ["update_resume", "needs_follow_up"],
+  applied: ["need_referral", "online_assessment", "needs_follow_up"],
+  screen: ["online_assessment", "screening_call", "needs_follow_up"],
+  interview: ["needs_follow_up"],
+  onsite: ["needs_follow_up"],
   offer: ["offer_negotiation", "needs_follow_up"],
   rejected: [],
   withdrawn: [],

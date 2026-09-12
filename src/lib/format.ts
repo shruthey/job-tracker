@@ -8,6 +8,8 @@ import type {
 
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   saved: "Saved",
+  referral_requested: "Referral Requested",
+  referral_given: "Referral Given",
   applied: "Applied",
   screen: "Screen",
   interview: "Interview",
@@ -67,9 +69,11 @@ const STATUS_HUE: Record<
   { color: string; strength: number }
 > = {
   saved: { color: "--color-chrome", strength: 45 },
-  applied: { color: "--color-brand", strength: 22 },
-  screen: { color: "--color-brand", strength: 38 },
-  interview: { color: "--color-brand", strength: 54 },
+  referral_requested: { color: "--color-brand", strength: 12 },
+  referral_given: { color: "--color-brand", strength: 24 },
+  applied: { color: "--color-brand", strength: 36 },
+  screen: { color: "--color-brand", strength: 48 },
+  interview: { color: "--color-brand", strength: 60 },
   onsite: { color: "--color-brand", strength: 72 },
   offer: { color: "--color-attn", strength: 70 },
   rejected: { color: "--color-warn", strength: 45 },
@@ -157,48 +161,31 @@ export const STATUS_CHART_COLORS: Record<ApplicationStatus, string> =
  * status but can show several tags, so tags must read as secondary.
  */
 export const TAGS = {
-  // Chrome: quietest family. Three steps across the full range, since chrome
-  // is already low-chroma and small deltas vanish.
+  // Attn, at full strength: the tags that are a to-do rather than a record of
+  // something that happened, so they are the ones meant to catch the eye.
+  // They lead the display order for the same reason.
   need_referral: {
     label: "Need Referral",
     color: "--color-attn",
     strength: 100,
   },
-  referral_requested: {
-    label: "Referral Requested",
-    color: "--color-brand",
-    strength: 50,
-  },
-  referral_given: {
-    label: "Referral Given",
-    color: "--color-brand",
-    strength: 50,
+  update_resume: {
+    label: "Update Resume",
+    color: "--color-attn",
+    strength: 100,
   },
 
-  // Brand: three visible tiers — early contact, live evaluation, final rounds.
-  recruiter_reachout: {
-    label: "Recruiter Reachout",
+  // Brand: the evaluation steps, the earlier of the two the quieter.
+  screening_call: {
+    label: "Screening Call",
     color: "--color-brand",
-    strength: 14,
+    strength: 38,
   },
   online_assessment: {
     label: "Online Assessment",
     color: "--color-brand",
     strength: 50,
   },
-  take_home: { label: "Take-home", color: "--color-brand", strength: 14 },
-  screening_call: {
-    label: "Screening Call",
-    color: "--color-brand",
-    strength: 38,
-  },
-  tech_screen: { label: "Tech Screen", color: "--color-brand", strength: 38 },
-  system_design: {
-    label: "System Design",
-    color: "--color-brand",
-    strength: 68,
-  },
-  panel_round: { label: "Panel Round", color: "--color-brand", strength: 68 },
 
   // Attn: both are calls to action, so both sit high.
   offer_negotiation: {

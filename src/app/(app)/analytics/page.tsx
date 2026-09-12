@@ -11,6 +11,7 @@ import {
   StageDurationChart,
 } from "@/components/analytics-charts";
 import { STATUS_LABELS, statusDotStyle } from "@/lib/format";
+import { PageWidth } from "@/components/page";
 
 /**
  * Reads live database state on every request, so it must never be prerendered
@@ -106,104 +107,106 @@ export default async function AnalyticsPage() {
   const pct = (n: number) => `${Math.round(n * 100)}%`;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-ink dark:text-muted">
-          Analytics
-        </h1>
-        <p className="mt-1 text-sm text-muted dark:text-muted">
-          Derived from the status event log, not from current status.
-        </p>
-      </div>
+    <PageWidth>
+      <div className="flex flex-col gap-6">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-ink dark:text-muted">
+            Analytics
+          </h1>
+          <p className="mt-1 text-sm text-muted dark:text-muted">
+            Derived from the status event log, not from current status.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <Stat label="Active" value={totals.active} tone="active" />
-        <Stat label="Applied" value={totals.applied} tone="applied" />
-        <Stat label="Interviewing" value={totals.interviewing} tone="interviewing" />
-        <Stat label="Offers" value={totals.offers} tone="offers" />
-        <Stat label="Rejected" value={totals.rejected} tone="rejected" />
-        <Stat label="Ghosted" value={totals.ghosted} tone="ghosted" />
-      </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <Stat label="Active" value={totals.active} tone="active" />
+          <Stat label="Applied" value={totals.applied} tone="applied" />
+          <Stat label="Interviewing" value={totals.interviewing} tone="interviewing" />
+          <Stat label="Offers" value={totals.offers} tone="offers" />
+          <Stat label="Rejected" value={totals.rejected} tone="rejected" />
+          <Stat label="Ghosted" value={totals.ghosted} tone="ghosted" />
+        </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Panel
-          title="Funnel"
-          hint="Applications that ever reached each stage, including those that have since moved on."
-        >
-          <FunnelChart data={funnel} />
-          <table className="mt-4 w-full text-xs">
-            <tbody className="divide-y divide-chrome dark:divide-chrome">
-              {funnel.map((stage) => (
-                <tr key={stage.status}>
-                  <td className="py-1.5 text-ink dark:text-muted">
-                    <span className="inline-flex items-center gap-1.5">
-                      <span
-                        aria-hidden="true"
-                        className="h-2 w-2 rounded-full"
-                        style={statusDotStyle(stage.status)}
-                      />
-                      {STATUS_LABELS[stage.status]}
-                    </span>
-                  </td>
-                  <td className="py-1.5 text-right tabular-nums text-ink dark:text-muted">
-                    {stage.reached}
-                  </td>
-                  <td className="w-20 py-1.5 text-right tabular-nums">
-                    {stage.conversionFromPrevious === null
-                      ? "—"
-                      : pct(stage.conversionFromPrevious)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Panel>
-
-        <Panel
-          title="Median time in stage"
-          hint="Measured between consecutive events. Applications still in a stage are excluded."
-        >
-          <StageDurationChart data={stages} />
-        </Panel>
-
-        <Panel
-          title="Response rate by source"
-          hint="A rejection counts as a response; silence does not."
-        >
-          {sources.length === 0 ? (
-            <p className="py-12 text-center text-sm">Nothing applied to yet.</p>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs uppercase tracking-wide">
-                <tr>
-                  <th className="pb-2 font-medium">Source</th>
-                  <th className="pb-2 text-right font-medium">Applied</th>
-                  <th className="pb-2 text-right font-medium">Responded</th>
-                  <th className="pb-2 text-right font-medium">Rate</th>
-                </tr>
-              </thead>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Panel
+            title="Funnel"
+            hint="Applications that ever reached each stage, including those that have since moved on."
+          >
+            <FunnelChart data={funnel} />
+            <table className="mt-4 w-full text-xs">
               <tbody className="divide-y divide-chrome dark:divide-chrome">
-                {sources.map((s) => (
-                  <tr key={s.source}>
-                    <td className="py-2 text-ink dark:text-muted">
-                      {s.source}
+                {funnel.map((stage) => (
+                  <tr key={stage.status}>
+                    <td className="py-1.5 text-ink dark:text-muted">
+                      <span className="inline-flex items-center gap-1.5">
+                        <span
+                          aria-hidden="true"
+                          className="h-2 w-2 rounded-full"
+                          style={statusDotStyle(stage.status)}
+                        />
+                        {STATUS_LABELS[stage.status]}
+                      </span>
                     </td>
-                    <td className="py-2 text-right tabular-nums">{s.total}</td>
-                    <td className="py-2 text-right tabular-nums">{s.responded}</td>
-                    <td className="py-2 text-right tabular-nums text-ink dark:text-muted">
-                      {pct(s.responseRate)}
+                    <td className="py-1.5 text-right tabular-nums text-ink dark:text-muted">
+                      {stage.reached}
+                    </td>
+                    <td className="w-20 py-1.5 text-right tabular-nums">
+                      {stage.conversionFromPrevious === null
+                        ? "—"
+                        : pct(stage.conversionFromPrevious)}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          )}
-        </Panel>
+          </Panel>
 
-        <Panel title="Applications submitted" hint="Per week, last six months.">
-          <ActivityChart data={activity} />
-        </Panel>
+          <Panel
+            title="Median time in stage"
+            hint="Measured between consecutive events. Applications still in a stage are excluded."
+          >
+            <StageDurationChart data={stages} />
+          </Panel>
+
+          <Panel
+            title="Response rate by source"
+            hint="A rejection counts as a response; silence does not."
+          >
+            {sources.length === 0 ? (
+              <p className="py-12 text-center text-sm">Nothing applied to yet.</p>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs uppercase tracking-wide">
+                  <tr>
+                    <th className="pb-2 font-medium">Source</th>
+                    <th className="pb-2 text-right font-medium">Applied</th>
+                    <th className="pb-2 text-right font-medium">Responded</th>
+                    <th className="pb-2 text-right font-medium">Rate</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-chrome dark:divide-chrome">
+                  {sources.map((s) => (
+                    <tr key={s.source}>
+                      <td className="py-2 text-ink dark:text-muted">
+                        {s.source}
+                      </td>
+                      <td className="py-2 text-right tabular-nums">{s.total}</td>
+                      <td className="py-2 text-right tabular-nums">{s.responded}</td>
+                      <td className="py-2 text-right tabular-nums text-ink dark:text-muted">
+                        {pct(s.responseRate)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Panel>
+
+          <Panel title="Applications submitted" hint="Per week, last six months.">
+            <ActivityChart data={activity} />
+          </Panel>
+        </div>
       </div>
-    </div>
+    </PageWidth>
   );
 }

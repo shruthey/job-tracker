@@ -16,7 +16,7 @@ import {
   type ApplicationTag,
   type CompanyPipeline,
   type CompanyPriority,
-  FUNNEL_ORDER,
+  PROGRESS_ORDER,
 } from "@/db/schema";
 
 export type ApplicationFilters = {
@@ -239,11 +239,13 @@ export async function listInterviews(applicationId: string) {
  * `furthestStatus` is the most advanced stage any application at this company
  * reached, taken from status_events rather than the current status: an
  * application now marked "rejected" still tells you that you got to onsite.
- * The ordinal comes from FUNNEL_ORDER so the comparison is by progress, not by
- * the enum's declaration order.
+ * The ordinal comes from PROGRESS_ORDER so the comparison is by progress, not
+ * by the enum's declaration order. That list rather than FUNNEL_ORDER, because
+ * a requested referral is further along than `saved` and should read that way
+ * here, even though it is not a conversion step on the funnel chart.
  */
 export async function listCompanyOverview() {
-  const funnelRank = FUNNEL_ORDER.map(
+  const funnelRank = PROGRESS_ORDER.map(
     (s, i) => `when '${s}' then ${i}`,
   ).join(" ");
 
