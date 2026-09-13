@@ -35,6 +35,7 @@ import {
 } from "@/lib/format";
 import { TagList } from "@/components/tag-chip";
 import { SponsorshipBadge } from "@/components/sponsorship-badge";
+import { YcBadge } from "@/components/yc-badge";
 import { CalendarIcon, ChevronRightIcon, ExternalLinkIcon } from "@/components/icons";
 import { ContactsHint } from "@/components/contacts-hint";
 import { moveApplication } from "@/lib/actions";
@@ -377,6 +378,7 @@ export type Card = {
   location: string | null;
   remoteType: "onsite" | "hybrid" | "remote" | null;
   sponsorship: Sponsorship | null;
+  isYCombinator: boolean;
   salaryMin: number | null;
   salaryMax: number | null;
   currency: string | null;
@@ -430,8 +432,16 @@ function CardTile({
         removable on the detail page, just not here, where they would read as
         belonging to the current stage.
       */}
-      {card.sponsorship ? (
-        <SponsorshipBadge sponsorship={card.sponsorship} className="mt-1.5" />
+      {/*
+        One row for both employer chips so a card carrying each does not spend
+        two lines on them. Renders nothing when neither is set — both badges
+        return null on their own, and the wrapper is skipped with them.
+      */}
+      {card.sponsorship || card.isYCombinator ? (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1">
+          <YcBadge isYCombinator={card.isYCombinator} />
+          <SponsorshipBadge sponsorship={card.sponsorship} />
+        </div>
       ) : null}
       <TagList
         tags={card.tags.filter((tag) => isTagAllowed(card.status, tag))}

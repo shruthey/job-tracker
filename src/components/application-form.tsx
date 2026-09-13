@@ -16,6 +16,7 @@ type Values = Partial<{
   location: string;
   remoteType: string;
   sponsorship: string;
+  isYCombinator: boolean;
   salaryMin: number | null;
   salaryMax: number | null;
   currency: string;
@@ -96,6 +97,41 @@ export function ApplicationForm({
     </Field>
   );
 
+  /**
+   * A checkbox rather than a select: this is one yes/no fact about the
+   * employer, and an unticked box reads as "no" the way an empty select would
+   * not. It leads the form rather than sitting among the fields grid because
+   * it is the one thing the parser cannot fill in — the question the review
+   * page is asking the user to answer.
+   *
+   * The hidden input before it carries the unchecked case: a checkbox that is
+   * off submits nothing at all, which the update action would otherwise be
+   * unable to tell apart from a form that never rendered the field.
+   * `Object.fromEntries` keeps the last value, so the checkbox overrides the
+   * hidden default whenever it is on.
+   */
+  const ycField = (
+    <div className="flex flex-col gap-1.5">
+      <label className="flex w-fit cursor-pointer items-center gap-2.5 rounded-lg border border-chrome bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-brand dark:border-chrome dark:bg-chrome dark:text-muted dark:hover:border-brand">
+        <input type="hidden" name="isYCombinator" value="false" />
+        <input
+          id="isYCombinator"
+          name="isYCombinator"
+          type="checkbox"
+          value="on"
+          defaultChecked={values.isYCombinator ?? false}
+          className="h-3.5 w-3.5 rounded border-chrome accent-brand dark:border-chrome"
+        />
+        Y Combinator company
+      </label>
+      {errors.isYCombinator?.length ? (
+        <p className="text-xs text-warn dark:text-warn">
+          {errors.isYCombinator[0]}
+        </p>
+      ) : null}
+    </div>
+  );
+
   const jobUrlField = (
     <Field
       label="Job URL"
@@ -134,6 +170,8 @@ export function ApplicationForm({
       ) : null}
 
       {jdPosition === "top" ? jdField : null}
+
+      {ycField}
 
       {requireJobUrl ? jobUrlField : null}
 

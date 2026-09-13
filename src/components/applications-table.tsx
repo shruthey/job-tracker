@@ -9,6 +9,7 @@ import { ContactsHint } from "@/components/contacts-hint";
 import { formatDate, formatDateTime, formatSalary } from "@/lib/format";
 import { TagList } from "@/components/tag-chip";
 import { SponsorshipBadge } from "@/components/sponsorship-badge";
+import { YcBadge } from "@/components/yc-badge";
 import { CalendarIcon, ExternalLinkIcon } from "@/components/icons";
 import type { ApplicationRow } from "@/lib/queries";
 
@@ -264,8 +265,14 @@ export function ApplicationsTable({ rows }: { rows: ApplicationRow[] }) {
                     <TagList tags={row.tags} className="mt-1.5" />
                   </td>
                   <td className="px-4 py-3 text-muted dark:text-muted">
+                    {/*
+                      The YC mark belongs to the employer, so it rides in the
+                      company cell rather than taking a column of its own — a
+                      column would be mostly empty and push the rest wider.
+                    */}
                     <span className="inline-flex items-center gap-1">
                       {row.companyName}
+                      <YcBadge isYCombinator={row.isYCombinator} />
                       <ContactsHint
                         contacts={row.contacts}
                         companyName={row.companyName}

@@ -95,6 +95,7 @@ async function createFrom(
           location: input.location ?? null,
           remoteType: input.remoteType ?? null,
           sponsorship: input.sponsorship ?? null,
+          isYCombinator: input.isYCombinator,
           salaryMin: input.salaryMin ?? null,
           salaryMax: input.salaryMax ?? null,
           currency: input.currency ?? null,
@@ -159,6 +160,16 @@ export async function updateApplication(
           location: input.location ?? null,
           remoteType: input.remoteType ?? null,
           sponsorship: input.sponsorship ?? null,
+          /**
+           * Guarded like source and notes above, but for a different reason: an
+           * unchecked checkbox submits nothing at all, so a form that renders
+           * the box and one that omits it produce identical FormData. The
+           * companion hidden input in `ApplicationForm` is what makes the name
+           * present whenever the box was actually on screen.
+           */
+          ...(submitted("isYCombinator")
+            ? { isYCombinator: input.isYCombinator }
+            : {}),
           salaryMin: input.salaryMin ?? null,
           salaryMax: input.salaryMax ?? null,
           currency: input.currency ?? null,

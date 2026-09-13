@@ -114,6 +114,7 @@ export default async function ApplicationDetailPage(
                   location: application.location ?? "",
                   remoteType: application.remoteType ?? "",
                   sponsorship: application.sponsorship ?? "",
+                  isYCombinator: application.isYCombinator,
                   salaryMin: application.salaryMin,
                   salaryMax: application.salaryMax,
                   currency: application.currency ?? "",

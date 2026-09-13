@@ -1,5 +1,6 @@
 import {
   bigint,
+  boolean,
   index,
   integer,
   jsonb,
@@ -276,6 +277,13 @@ export const applications = pgTable(
     remoteType: remoteType("remote_type"),
     /** Null when the posting never mentions work authorization. */
     sponsorship: sponsorship("sponsorship"),
+    /**
+     * Whether the employer is a Y Combinator company. Unlike `sponsorship`
+     * this is not something the parser guesses at — it is a checkbox the user
+     * ticks while reviewing a parsed posting, so false means "not marked"
+     * rather than "the posting didn't say".
+     */
+    isYCombinator: boolean("is_y_combinator").notNull().default(false),
     // Whole currency units. Postings quote round numbers; cents buy nothing here.
     salaryMin: integer("salary_min"),
     salaryMax: integer("salary_max"),

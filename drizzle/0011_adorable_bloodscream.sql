@@ -1,0 +1,1 @@
+ALTER TABLE "applications" ADD COLUMN "is_y_combinator" boolean DEFAULT false NOT NULL;

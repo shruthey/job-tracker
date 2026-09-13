@@ -38,6 +38,14 @@ const optionalInt = emptyToUndefined(
     .optional(),
 );
 
+/**
+ * An HTML checkbox submits "on" when ticked and is absent from the FormData
+ * entirely when not, so anything other than a present checked box is false.
+ * Written as a preprocess rather than `z.coerce.boolean()` because that coerces
+ * every non-empty string — "off" included — to true.
+ */
+const checkbox = z.preprocess((v) => v === "on" || v === "true", z.boolean());
+
 export const applicationInputSchema = z
   .object({
     company: z.string().trim().min(1, "Company is required"),
@@ -48,6 +56,7 @@ export const applicationInputSchema = z
     location: optionalText,
     remoteType: emptyToUndefined(z.enum(remoteType.enumValues).optional()),
     sponsorship: emptyToUndefined(z.enum(sponsorship.enumValues).optional()),
+    isYCombinator: checkbox,
     salaryMin: optionalInt,
     salaryMax: optionalInt,
     currency: optionalText,

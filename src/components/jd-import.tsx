@@ -86,6 +86,8 @@ export function JdImport() {
               location: d.location ?? "",
               remoteType: d.remoteType ?? "",
               sponsorship: d.sponsorship ?? "",
+              // The parser never sets this; it is the user's call on review.
+              isYCombinator: false,
               salaryMin: d.salaryMin,
               salaryMax: d.salaryMax,
               currency: d.currency ?? "",

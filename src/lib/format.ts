@@ -251,6 +251,18 @@ export function sponsorshipChipStyle(value: Sponsorship): CSSProperties {
   const { color, strength } = SPONSORSHIP_HUE[value];
   return { backgroundColor: chipFill(color, strength), color: chipText(color) };
 }
+
+/**
+ * The YC chip. Attn at full strength, matching the to-do tags: a card shows it
+ * only when the flag is set, so it is a positive mark meant to be picked out of
+ * a column at a glance rather than a neutral field like sponsorship.
+ */
+export function ycChipStyle(): CSSProperties {
+  return {
+    backgroundColor: chipFill("--color-attn", 100),
+    color: chipText("--color-attn"),
+  };
+}
 export const INTERVIEW_FORMAT_LABELS: Record<string, string> = {
   phone: "Phone",
   video: "Video",
