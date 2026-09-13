@@ -117,6 +117,7 @@ export const applicationTag = pgEnum("application_tag", [
   // `TAG_ORDER` below, which is independent of this.
   "need_referral",
   "update_resume",
+  "referred",
 ]);
 
 export type ApplicationTag = (typeof applicationTag.enumValues)[number];
@@ -126,10 +127,17 @@ export type ApplicationTag = (typeof applicationTag.enumValues)[number];
  * `@/lib/format`, which `TAG_ORDER` and `TAG_LABELS` are derived from. The
  * enum above is only the stored vocabulary.
  *
- * `need_referral` is the one referral tag left: "this role wants one and I
- * haven't asked anyone yet", a to-do. Once you have actually asked, that is a
- * status rather than a tag — the `referral_requested` and `referral_given`
- * board columns — so the tags by those names were removed.
+ * `need_referral` is a to-do: "this role wants one and I haven't asked anyone
+ * yet". The act of chasing one is a status rather than a tag — the
+ * `referral_requested` and `referral_given` board columns — so the tags by
+ * those names were removed.
+ *
+ * `referred` is neither of those. It is the standing fact that someone put you
+ * in, and it stays true for the rest of the application's life: it must still
+ * be visible at `onsite` or `offer`, long after the referral columns are
+ * behind you, because "did I get in through a referral?" is a question asked
+ * of the whole pipeline. That is why it is a tag offered in every active
+ * status rather than a status of its own — see `STATUS_TAGS`.
  */
 
 /**
@@ -149,14 +157,30 @@ export const STATUS_TAGS = {
    * after: once it is submitted, "update resume" is no longer a to-do for this
    * application.
    */
-  saved: ["need_referral", "update_resume", "needs_follow_up"],
-  referral_requested: ["update_resume", "needs_follow_up"],
-  referral_given: ["update_resume", "needs_follow_up"],
-  applied: ["need_referral", "online_assessment", "needs_follow_up"],
-  screen: ["online_assessment", "screening_call", "needs_follow_up"],
-  interview: ["needs_follow_up"],
-  onsite: ["needs_follow_up"],
-  offer: ["offer_negotiation", "needs_follow_up"],
+  /*
+   * `referred` appears in every non-terminal status. It is the one tag that
+   * records a standing fact rather than a stage-bound milestone, so gating it
+   * to the referral columns would hide it exactly where it matters most —
+   * on an application that has advanced to `onsite` or `offer`.
+   *
+   * The three terminal statuses are left out for the usual reason: nothing
+   * there is actionable. An application that carried the tag in earlier
+   * stages still shows it after it's rejected, and can still have it removed,
+   * because the picker keeps an already-applied tag interactive.
+   */
+  saved: ["need_referral", "referred", "update_resume", "needs_follow_up"],
+  referral_requested: ["referred", "update_resume", "needs_follow_up"],
+  referral_given: ["referred", "update_resume", "needs_follow_up"],
+  applied: [
+    "need_referral",
+    "referred",
+    "online_assessment",
+    "needs_follow_up",
+  ],
+  screen: ["referred", "online_assessment", "screening_call", "needs_follow_up"],
+  interview: ["referred", "needs_follow_up"],
+  onsite: ["referred", "needs_follow_up"],
+  offer: ["referred", "offer_negotiation", "needs_follow_up"],
   rejected: [],
   withdrawn: [],
   ghosted: ["needs_follow_up"],

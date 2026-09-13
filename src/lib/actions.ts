@@ -328,6 +328,22 @@ export async function toggleApplicationTag(input: {
 
     if (removed.length === 0) {
       await db.insert(applicationTags).values({ applicationId, tag });
+
+      // "I still need a referral" and "I have one" can't both be true, so
+      // turning on `referred` retires the to-do rather than leaving the card
+      // contradicting itself. Only this direction is automatic: removing
+      // `referred` does not put `need_referral` back, because un-ticking it is
+      // just as likely to be a correction as a reversal.
+      if (tag === "referred") {
+        await db
+          .delete(applicationTags)
+          .where(
+            and(
+              eq(applicationTags.applicationId, applicationId),
+              eq(applicationTags.tag, "need_referral"),
+            ),
+          );
+      }
     }
   } catch (error) {
     console.error("toggleApplicationTag failed", error);

@@ -175,6 +175,17 @@ export const TAGS = {
     strength: 100,
   },
 
+  // Brand, at full strength: not a to-do but a standing advantage, and the one
+  // tag that rides along for the whole application. It sits directly after the
+  // to-dos and above the evaluation steps because it is the first thing worth
+  // knowing about a card — and it takes brand rather than attn precisely
+  // because it asks nothing of you.
+  referred: {
+    label: "Referred",
+    color: "--color-brand",
+    strength: 100,
+  },
+
   // Brand: the evaluation steps, the earlier of the two the quieter.
   screening_call: {
     label: "Screening Call",
@@ -253,15 +264,13 @@ export function sponsorshipChipStyle(value: Sponsorship): CSSProperties {
 }
 
 /**
- * The YC chip. Attn at full strength, matching the to-do tags: a card shows it
- * only when the flag is set, so it is a positive mark meant to be picked out of
- * a column at a glance rather than a neutral field like sponsorship.
+ * The YC chip. The one chip that sits outside the palette: YC's own orange is
+ * the mark people recognize, so it is a literal rather than a tint of `attn`,
+ * and it stays the same in both themes. White text for the same reason — the
+ * fill is fixed, so `--on-tint` would flip to dark on orange in one theme.
  */
 export function ycChipStyle(): CSSProperties {
-  return {
-    backgroundColor: chipFill("--color-attn", 100),
-    color: chipText("--color-attn"),
-  };
+  return { backgroundColor: "#ff4000", color: "#fff" };
 }
 export const INTERVIEW_FORMAT_LABELS: Record<string, string> = {
   phone: "Phone",
